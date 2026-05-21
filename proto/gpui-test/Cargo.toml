@@ -1,0 +1,20 @@
+[package]
+name = "gpui-component-test"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+
+[dependencies.gpui]
+git = "https://github.com/zed-industries/zed"
+
+[dependencies.gpui_platform]
+git = "https://github.com/zed-industries/zed"
+features = ["font-kit"]
+
+[dependencies.gpui-component]
+git = "https://github.com/longbridge/gpui-component"
+
+[dependencies.gpui-component-assets]
+git = "https://github.com/longbridge/gpui-component"
