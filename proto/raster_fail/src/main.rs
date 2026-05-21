@@ -1,101 +1,225 @@
-﻿use gpui::*;
-use gpui_component::{Root, *};
+﻿#![cfg_attr(target_family = "wasm", no_main)]
 
-struct MapApp {
-    zoom: u8,
-    cols: usize,
-    rows: usize,
-    tile_urls: Vec<String>,
+use std::fs;
+use std::path::PathBuf;
+use std::sync::Arc;
+
+use anyhow::Result;
+use gpui::{
+    App, AppContext, AssetSource, Bounds, Context, ImageSource, KeyBinding, Menu, MenuItem, Point,
+    SharedString, SharedUri, TitlebarOptions, Window, WindowBounds, WindowOptions, actions, div,
+    img, prelude::*, px, rgb, size,
+};
+#[cfg(not(target_family = "wasm"))]
+use reqwest_client::ReqwestClient;
+
+struct Assets {
+    base: PathBuf,
 }
 
-impl MapApp {
-    fn new() -> Self {
-        let zoom = 3;
-        let cols = 8;
-        let rows = 8;
-        let start_x = 0;
-        let start_y = 0;
+impl AssetSource for Assets {
+    fn load(&self, path: &str) -> Result<Option<std::borrow::Cow<'static, [u8]>>> {
+        fs::read(self.base.join(path))
+            .map(|data| Some(std::borrow::Cow::Owned(data)))
+            .map_err(|e| e.into())
+    }
 
-        let tile_urls = (0..rows)
-            .flat_map(|row| {
-                (0..cols).map(move |col| {
-                    format!(
-                        "https://tile.openstreetmap.org/{}/{}/{}.png",
-                        zoom,
-                        start_x + col as u32,
-                        start_y + row as u32,
-                    )
-                })
+    fn list(&self, path: &str) -> Result<Vec<SharedString>> {
+        fs::read_dir(self.base.join(path))
+            .map(|entries| {
+                entries
+                    .filter_map(|entry| {
+                        entry
+                            .ok()
+                            .and_then(|entry| entry.file_name().into_string().ok())
+                            .map(SharedString::from)
+                    })
+                    .collect()
             })
-            .collect();
+            .map_err(|e| e.into())
+    }
+}
 
+#[derive(IntoElement)]
+struct ImageContainer {
+    text: SharedString,
+    src: ImageSource,
+}
+
+impl ImageContainer {
+    pub fn new(text: impl Into<SharedString>, src: impl Into<ImageSource>) -> Self {
         Self {
-            zoom,
-            cols,
-            rows,
-            tile_urls,
+            text: text.into(),
+            src: src.into(),
         }
     }
 }
 
-impl Render for MapApp {
-    fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
-        let mut root = div()
-            .v_flex()
+impl RenderOnce for ImageContainer {
+    fn render(self, _window: &mut Window, _: &mut App) -> impl IntoElement {
+        div().child(
+            div()
+                .flex_row()
+                .size_full()
+                .gap_4()
+                .child(self.text)
+                .child(img(self.src).size(px(256.0))),
+        )
+    }
+}
+
+struct ImageShowcase {
+    local_resource: Arc<std::path::Path>,
+    remote_resource: SharedUri,
+    asset_resource: SharedString,
+}
+
+impl Render for ImageShowcase {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        div()
+            .id("main")
+            .bg(gpui::white())
+            .overflow_y_scroll()
+            .p_5()
             .size_full()
-            .gap_2()
-            .paddings(16.0)
-            .bg(rgb(0x0f0f11))
             .child(
                 div()
-                    .child(format!(
-                        "OSM raster tiles · north-up · zoom {} · {}×{}",
-                        self.zoom, self.cols, self.rows
+                    .flex()
+                    .flex_col()
+                    .justify_center()
+                    .items_center()
+                    .gap_8()
+                    .child(img(
+                        "https://github.com/zed-industries/zed/actions/workflows/ci.yml/badge.svg",
                     ))
-                    .text_color(rgb(0xf0f0f8))
-                    .text_size(px(20.0)),
-            );
-        root.style().overflow.x = Some(Overflow::Scroll);
-        root.style().overflow.y = Some(Overflow::Scroll);
-
-        for row in 0..self.rows {
-            let mut row_div = div().h_flex().gap_2();
-
-            for col in 0..self.cols {
-                let idx = row * self.cols + col;
-                let tile_url = self.tile_urls[idx].clone();
-
-                let tile = img(tile_url)
-                    .size(px(256.0))
-                    .border(px(1.0))
-                    .border_color(rgb(0x292a2d))
-                    .with_loading(|| "loading".into_any_element())
-                    .with_fallback(|| "load error".into_any_element());
-
-                row_div = row_div.child(tile);
-            }
-
-            root = root.child(row_div);
-        }
-
-        root
+                    .child(
+                        div()
+                            .flex()
+                            .flex_row()
+                            .justify_center()
+                            .items_center()
+                            .gap_8()
+                            .child(ImageContainer::new(
+                                "Image loaded from a local file",
+                                self.local_resource.clone(),
+                            ))
+                            .child(ImageContainer::new(
+                                "Image loaded from a remote resource",
+                                self.remote_resource.clone(),
+                            ))
+                            .child(ImageContainer::new(
+                                "Image loaded from an asset",
+                                self.asset_resource.clone(),
+                            )),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .flex_row()
+                            .gap_8()
+                            .child(
+                                div()
+                                    .flex_col()
+                                    .child("Auto Width")
+                                    .child(img("https://picsum.photos/800/400").h(px(180.))),
+                            )
+                            .child(
+                                div()
+                                    .flex_col()
+                                    .child("Auto Height")
+                                    .child(img("https://picsum.photos/800/400").w(px(180.))),
+                            ),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .flex_col()
+                            .justify_center()
+                            .items_center()
+                            .w_full()
+                            .border_1()
+                            .border_color(rgb(0xC0C0C0))
+                            .child("image with max width 100%")
+                            .child(img("https://picsum.photos/800/400").max_w_full()),
+                    ),
+            )
     }
 }
 
-fn main() {
-    let app = gpui_platform::application().with_assets(gpui_component_assets::Assets);
+actions!(image, [Quit]);
 
-    app.run(move |cx| {
-        gpui_component::init(cx);
+fn run_example() {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
-        cx.spawn(async move |cx| {
-            cx.open_window(WindowOptions::default(), |window, cx| {
-                let view = cx.new(|_| MapApp::new());
+    #[cfg(not(target_family = "wasm"))]
+    let app = gpui_platform::application();
+    #[cfg(target_family = "wasm")]
+    let app = gpui_platform::application();
+    app.with_assets(Assets {
+        base: manifest_dir.join("examples"),
+    })
+    .run(move |cx: &mut App| {
+        #[cfg(not(target_family = "wasm"))]
+        {
+            let http_client = ReqwestClient::user_agent("gpui example").unwrap();
+            cx.set_http_client(Arc::new(http_client));
+        }
+        #[cfg(target_family = "wasm")]
+        {
+            // Safety: the web examples run single-threaded; the client is
+            // created and used exclusively on the main thread.
+            let http_client = unsafe {
+                gpui_web::FetchHttpClient::with_user_agent("gpui example")
+                    .expect("failed to create FetchHttpClient")
+            };
+            cx.set_http_client(Arc::new(http_client));
+        }
 
-                cx.new(|cx| Root::new(view, window, cx))
+        cx.activate(true);
+        cx.on_action(|_: &Quit, cx| cx.quit());
+        cx.bind_keys([KeyBinding::new("cmd-q", Quit, None)]);
+        cx.set_menus(vec![Menu {
+            name: "Image".into(),
+            items: vec![MenuItem::action("Quit", Quit)],
+            disabled: false,
+        }]);
+
+        let window_options = WindowOptions {
+            titlebar: Some(TitlebarOptions {
+                title: Some(SharedString::from("Image Example")),
+                appears_transparent: false,
+                ..Default::default()
+            }),
+
+            window_bounds: Some(WindowBounds::Windowed(Bounds {
+                size: size(px(1100.), px(600.)),
+                origin: Point::new(px(200.), px(200.)),
+            })),
+
+            ..Default::default()
+        };
+
+        cx.open_window(window_options, |_, cx| {
+            cx.new(|_| ImageShowcase {
+                // Relative path to your root project path
+                local_resource: manifest_dir.join("app-icon.png").into(),
+                remote_resource: "https://tile.openstreetmap.org/14/14551/6459.png".into(),
+                asset_resource: "color.svg".into(),
             })
-            .expect("Failed to open window");
         })
-        .detach();
+        .unwrap();
     });
+}
+
+#[cfg(not(target_family = "wasm"))]
+fn main() {
+    env_logger::init();
+    run_example();
+}
+
+#[cfg(target_family = "wasm")]
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn start() {
+    gpui_platform::web_init();
+    run_example();
 }
