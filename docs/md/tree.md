@@ -1,4 +1,32 @@
+2026/06/09 計画段階 part2
+
+```
+.
+├── main.rs
+├── components/
+│   ├── atoms/
+│   │   └── button.rs
+│   └── molecules/
+│       └── search.rs
+├── apps/
+│   ├── MapApp/
+│   │   ├── core/
+│   │   │   └── useMapApp.rs
+│   │   └── ui/
+│   │       └── mapApp.rs
+│   └── dialogs/
+│       └── SettingDialog/
+│           ├── core
+│           └── ui
+├── infrastructure/
+│   └── stores
+└── domain/
+    ├── traits
+    └── params
+```
+
 2026/06/09 計画段階
+
 ```
 .
 ├── main.rs
