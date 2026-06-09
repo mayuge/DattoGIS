@@ -18,14 +18,14 @@ pub const ROTATE_2D_ANGLE: f64 = 0.0;
 /// 3D地図の回転角度
 pub const ROTATE_3D_ANGLE: f64 = 90.0;
 
-/// 初期表示中心座標（東京）
-pub const MAP_CENTER_LONGITUDE: f64 = 139.6917;
+/// 初期表示中心座標
+pub const MAP_CENTER_LONGITUDE: f64 = 137;
 
-/// 初期表示中心緯度（東京）
-pub const MAP_CENTER_LATITUDE: f64 = 35.6895;
+/// 初期表示中心緯度
+pub const MAP_CENTER_LATITUDE: f64 = 38.5;
 
 /// 初期ズームレベル
-pub const MAP_ZOOM_LEVEL: f64 = 8.0;
+pub const MAP_ZOOM_LEVEL: f64 = 5.0;
 
 /// 表示座標系（Web Mercator）
 pub const DISPLAY_PROJ_EPSG: u32 = 3857;

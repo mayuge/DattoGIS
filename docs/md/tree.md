@@ -11,11 +11,11 @@
 ├── apps/
 │   ├── MapApp/
 │   │   ├── core/
-│   │   │   └── useMapApp.rs
+│   │   │   └── use_map_app.rs
 │   │   └── ui/
-│   │       └── mapApp.rs
+│   │       └── map_app.rs
 │   └── dialogs/
-│       └── SettingDialog/
+│       └── setting_dialog/
 │           ├── core
 │           └── ui
 ├── infrastructure/
