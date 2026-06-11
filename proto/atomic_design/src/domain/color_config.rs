@@ -1,6 +1,6 @@
 /// カラー定義
-pub const COLOR_BLACK: &str = "#111111";
-pub const COLOR_WHITE: &str = "#ffffff";
+pub const COLOR_BASE: &str = "#111111";
+pub const COLOR_TEXT: &str = "#333333";
 
 pub const COLOR_PRIMARY: &str = "#5865f2";
 pub const COLOR_SECONDARY: &str = "#e7e9fd";
