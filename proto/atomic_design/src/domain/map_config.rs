@@ -17,5 +17,5 @@ pub const DATA_PROJ_EPSG: u32 = 4326;
 pub const DEFAULT_RASTER_TILE_URL: &str =
     "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png";
 
-/// デフォルトファイル形式
+/// デフォルトベクターファイル形式
 pub const DEFAULT_FILE_FORMAT: &str = "geojson";
