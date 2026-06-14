@@ -1,34 +1,9 @@
-use gpui::*;
-mod domain;
+mod apps;
 mod components;
-use components::atoms::button::*;
+mod domain;
 
-struct App;
-
-impl Render for App {
-    fn render(
-        &mut self,
-        _window: &mut Window,
-        _cx: &mut Context<Self>,
-    ) -> impl IntoElement {
-        Button::new(
-            String::from("保存"),
-            ButtonVariant::Primary,
-            ButtonShape::Circle,
-            ButtonSize::Medium,
-            None,
-            None,
-        )
-        .render()
-    }
-}
+use apps::app::create_app;
 
 fn main() {
-    Application::new().run(|cx| {
-        cx.open_window(
-            WindowOptions::default(),
-            |_window, cx| cx.new(|_| App),
-        )
-        .unwrap();
-    });
+    create_app();
 }
