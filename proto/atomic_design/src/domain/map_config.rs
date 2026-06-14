@@ -1,5 +1,5 @@
 /// 初期表示中心座標
-pub const MAP_CENTER_LONGITUDE: f64 = 137;
+pub const MAP_CENTER_LONGITUDE: f64 = 137.0;
 
 /// 初期表示中心緯度
 pub const MAP_CENTER_LATITUDE: f64 = 38.5;
