@@ -2,7 +2,7 @@
 /// 
 /// ここでは、デザインシステムで使用する基本的なトークンを定義します。
 
-pub const COLOR_BASE: u32 = 0x111111;
+pub const COLOR_BASE: u32 = 0x333333;
 pub const COLOR_TEXT: u32 = 0xffffff;
 
 /// カラーパレット定義
