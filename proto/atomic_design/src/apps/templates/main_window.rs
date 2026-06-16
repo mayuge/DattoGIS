@@ -2,9 +2,9 @@ use gpui::*;
 
 use crate::components::atoms::button::*;
 
-pub struct HomeTemplate;
+pub struct MainTemplate;
 
-impl HomeTemplate {
+impl MainTemplate {
     pub fn render() -> impl IntoElement {
         div()
             .flex()
