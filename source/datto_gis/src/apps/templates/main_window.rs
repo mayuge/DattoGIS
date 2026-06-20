@@ -1,7 +1,7 @@
 use gpui::*;
 
 use crate::components::atoms::button::*;
-use crate::components::atoms::header::*;
+
 
 pub struct MainTemplate;
 
@@ -12,7 +12,6 @@ impl MainTemplate {
             .flex_col()
             .gap(px(16.0))
             .p(px(16.0))
-            .child(Header::render())
             .child(
                 Button::new(
                     String::from("保存"),
