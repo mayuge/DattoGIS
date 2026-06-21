@@ -1,5 +1,5 @@
 //! タイル座標変換とURL生成ロジック
-
+use crate::domain::map_config::{MAP_MAX_LATITUDE, MAP_MIN_LATITUDE};
 use super::use_map_instance::{Coordinate, MapInstance};
 
 /// タイルURL生成の trait
@@ -38,7 +38,7 @@ fn convert_tile_from_coordinate(center: &Coordinate, zoom_level: u32) -> (u32, u
     // Web Mercator のタイル座標は経度を [0, 360] 度に変換し、
     // 緯度は正規化した値を扱う必要がある
     let normalized_longitude = center.longitude.clamp(-180.0, 180.0);
-    let normalized_latitude = center.latitude.clamp(-85.05112878, 85.05112878);
+    let normalized_latitude = center.latitude.clamp(MAP_MIN_LATITUDE, MAP_MAX_LATITUDE);
     let tile_count = 2_u32.pow(zoom_level);
 
     // 経度からタイルX座標を計算
