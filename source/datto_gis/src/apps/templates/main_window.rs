@@ -1,5 +1,6 @@
 use gpui::*;
 
+use crate::domain::app_config::*;
 use crate::components::atoms::button::*;
 use crate::components::atoms::header::*;
 
@@ -10,7 +11,7 @@ impl MainTemplate {
         div()
             .flex()
             .flex_col()
-            .child(Header::new(String::from("メインウィンドウ")).render())
+            .child(Header::new(String::from(APP_NAME)).render())
             .child(
                 Button::new(
                     String::from("保存"),

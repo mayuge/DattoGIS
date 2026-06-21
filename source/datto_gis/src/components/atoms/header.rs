@@ -13,6 +13,7 @@ impl Header {
   pub fn render(&self) -> impl IntoElement {
    div()
     .flex()
+    .window_control_area(WindowControlArea::Drag)
     .justify_between()
     .items_center()
     .h(px(HEADER_HEIGHT))
