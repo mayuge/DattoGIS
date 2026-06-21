@@ -31,6 +31,9 @@ pub const SPACE_MD: f32 = 8.0;
 pub const SPACE_LG: f32 = 16.0;
 pub const SPACE_XL: f32 = 32.0;
 
+/// ヘッダー高さ定義
+pub const HEADER_HEIGHT: f32 = 32.0;
+
 ///　ボーダー半径定義
 pub const BORDER_RADIUS_SM: f32 = 2.0;
 pub const BORDER_RADIUS_MD: f32 = 4.0;

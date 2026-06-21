@@ -1,7 +1,6 @@
 use gpui::*;
 
 use crate::apps::templates::main_window::MainTemplate;
-use crate::domain::app_config::*;
 use crate::domain::design_token_config::*;
 
 pub struct App;
