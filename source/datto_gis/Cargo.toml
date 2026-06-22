@@ -5,4 +5,4 @@ edition = "2024"
 
 [dependencies]
 gpui = "0.2.2"
-
+geojson = "1.0.0"

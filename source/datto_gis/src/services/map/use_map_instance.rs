@@ -1,6 +1,6 @@
 //! 地図表示状態を管理するドメインモデル
 
-use crate::domain::map_config::MapConfig;
+use crate::domain::map_config;
 
 /// 座標情報
 #[derive(Debug, Clone)]
@@ -27,10 +27,10 @@ impl Default for MapInstance {
     fn default() -> Self {
         Self {
             center: Coordinate {
-                longitude: MapConfig::MAP_CENTER_LONGITUDE,
-                latitude: MapConfig::MAP_CENTER_LATITUDE,
+                longitude: map_config::MAP_CENTER_LONGITUDE,
+                latitude: map_config::MAP_CENTER_LATITUDE,
             },
-            zoom_level: MapConfig::MAP_ZOOM_LEVEL,
+            zoom_level: map_config::MAP_ZOOM_LEVEL,
         }
     }
 }

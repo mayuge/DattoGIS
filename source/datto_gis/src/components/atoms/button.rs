@@ -47,7 +47,14 @@ impl Button {
         icon_left: Option<String>,
         icon_right: Option<String>,
     ) -> Self {
-        Self { text, variant, shape, size, icon_left, icon_right }
+        Self {
+            text,
+            variant,
+            shape,
+            size,
+            icon_left,
+            icon_right,
+        }
     }
     pub fn render(self) -> impl IntoElement {
         let (padding_x, padding_y) = match self.size {
@@ -62,24 +69,24 @@ impl Button {
             ButtonShape::Circle => px(999.0),
         };
 
-    let background = match self.variant {
-        ButtonVariant::Primary => rgb(COLOR_PRIMARY),
-        ButtonVariant::Secondary => rgb(COLOR_SECONDARY),
-        ButtonVariant::Danger => rgb(COLOR_DANGER),
-        ButtonVariant::Warning => rgb(COLOR_WARNING),
-        ButtonVariant::Success => rgb(COLOR_SUCCESS),
-    };
+        let background = match self.variant {
+            ButtonVariant::Primary => rgb(COLOR_PRIMARY),
+            ButtonVariant::Secondary => rgb(COLOR_SECONDARY),
+            ButtonVariant::Danger => rgb(COLOR_DANGER),
+            ButtonVariant::Warning => rgb(COLOR_WARNING),
+            ButtonVariant::Success => rgb(COLOR_SUCCESS),
+        };
 
-    let mut button = div()
-        .flex()
-        .items_center()
-        .justify_center()
-        .gap(px(SPACE_SM))
-        .px(px(padding_x))
-        .py(px(padding_y))
-        .rounded(border_radius)
-        .bg(background)
-        .text_color(rgb(COLOR_TEXT));
+        let mut button = div()
+            .flex()
+            .items_center()
+            .justify_center()
+            .gap(px(SPACE_SM))
+            .px(px(padding_x))
+            .py(px(padding_y))
+            .rounded(border_radius)
+            .bg(background)
+            .text_color(rgb(COLOR_TEXT));
 
         if let Some(icon) = self.icon_left {
             button = button.child(icon);

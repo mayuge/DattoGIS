@@ -1,8 +1,8 @@
 use gpui::*;
 
-use crate::domain::app_config::*;
 use crate::components::atoms::button::*;
-use crate::components::atoms::header::*;
+use crate::components::molecules::header::*;
+use crate::domain::app_config::*;
 
 pub struct MainTemplate;
 
@@ -11,28 +11,8 @@ impl MainTemplate {
         div()
             .flex()
             .flex_col()
-            .child(Header::new(String::from(APP_NAME)).render())
-            .child(
-                Button::new(
-                    String::from("保存"),
-                    ButtonVariant::Primary,
-                    ButtonShape::Rounded,
-                    ButtonSize::Medium,
-                    None,
-                    None,
-                )
-                .render(),
-            )
-            .child(
-                Button::new(
-                    String::from("削除"),
-                    ButtonVariant::Danger,
-                    ButtonShape::Rounded,
-                    ButtonSize::Medium,
-                    None,
-                    None,
-                )
-                .render(),
-            )
+            .size_full()
+            .child(Header::new(APP_NAME.to_string()).render())
+            .child(div().flex_grow())
     }
 }
