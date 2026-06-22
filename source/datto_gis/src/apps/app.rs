@@ -6,16 +6,12 @@ use crate::domain::design_token_config::*;
 pub struct App;
 
 impl Render for App {
-    fn render(
-        &mut self,
-        _window: &mut Window,
-        _cx: &mut Context<Self>,
-    ) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .size_full()
             .bg(rgb(COLOR_BASE))
             .text_color(rgb(COLOR_TEXT))
-            .child(MainTemplate::render())
+            .child(MainTemplate::render(window))
     }
 }
 

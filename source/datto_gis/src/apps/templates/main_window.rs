@@ -7,12 +7,10 @@ use crate::domain::app_config::*;
 pub struct MainTemplate;
 
 impl MainTemplate {
-    pub fn render() -> impl IntoElement {
+    pub fn render(window: &mut Window) -> impl IntoElement {
         div()
             .flex()
             .flex_col()
-            .size_full()
-            .child(Header::new(APP_NAME.to_string()).render())
-            .child(div().flex_grow())
+            .child(Header::new(APP_NAME.to_string()).render(window))
     }
 }

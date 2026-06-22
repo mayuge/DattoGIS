@@ -10,7 +10,7 @@ impl Header {
         Self { title }
     }
 
-    pub fn render(&self) -> impl IntoElement {
+    pub fn render(&self, window: &mut Window) -> impl IntoElement {
         div()
             .flex()
             .window_control_area(WindowControlArea::Drag)
@@ -25,6 +25,29 @@ impl Header {
                     .text_sm()
                     .text_color(rgb(COLOR_TEXT))
                     .child(self.title.clone()),
+            )
+            .child(
+                div()
+                    .flex()
+                    .gap(px(SPACE_SM))
+                    .child(div().px(px(8.0)).py(px(4.0)).child("－").on_mouse_down(
+                        MouseButton::Left,
+                        move |_, window, _| {
+                            window.minimize_window();
+                        },
+                    ))
+                    .child(div().px(px(8.0)).py(px(4.0)).child("□").on_mouse_down(
+                        MouseButton::Left,
+                        move |_, window, _| {
+                            window.zoom_window();
+                        },
+                    ))
+                    .child(div().px(px(8.0)).py(px(4.0)).child("×").on_mouse_down(
+                        MouseButton::Left,
+                        move |_, window, _| {
+                            window.remove_window();
+                        },
+                    )),
             )
     }
 }
