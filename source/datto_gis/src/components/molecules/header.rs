@@ -1,5 +1,6 @@
 use crate::domain::design_token_config::*;
 use gpui::*;
+use std::path::PathBuf;
 
 pub struct Header {
     title: String,
@@ -30,24 +31,47 @@ impl Header {
                 div()
                     .flex()
                     .gap(px(SPACE_SM))
-                    .child(div().px(px(8.0)).py(px(4.0)).child("－").on_mouse_down(
-                        MouseButton::Left,
-                        move |_, window, _| {
-                            window.minimize_window();
-                        },
-                    ))
-                    .child(div().px(px(8.0)).py(px(4.0)).child("□").on_mouse_down(
-                        MouseButton::Left,
-                        move |_, window, _| {
-                            window.zoom_window();
-                        },
-                    ))
-                    .child(div().px(px(8.0)).py(px(4.0)).child("×").on_mouse_down(
-                        MouseButton::Left,
-                        move |_, window, _| {
-                            window.remove_window();
-                        },
-                    )),
+                    .child(
+                        div()
+                            .size(px(24.0))
+                            .flex()
+                            .justify_center()
+                            .items_center()
+                            .child(
+                                img(PathBuf::from("assets/window/minimize_window.svg"))
+                                    .size(px(20.0)),
+                            )
+                            .on_mouse_down(MouseButton::Left, move |_, window, _| {
+                                window.minimize_window();
+                            }),
+                    )
+                    .child(
+                        div()
+                            .size(px(24.0))
+                            .flex()
+                            .justify_center()
+                            .items_center()
+                            .child(
+                                img(PathBuf::from("assets/window/fullscreen_window.svg"))
+                                    .size(px(20.0)),
+                            )
+                            .on_mouse_down(MouseButton::Left, move |_, window, _| {
+                                window.zoom_window();
+                            }),
+                    )
+                    .child(
+                        div()
+                            .size(px(24.0))
+                            .flex()
+                            .justify_center()
+                            .items_center()
+                            .child(
+                                img(PathBuf::from("assets/window/close_window.svg")).size(px(20.0)),
+                            )
+                            .on_mouse_down(MouseButton::Left, move |_, window, _| {
+                                window.remove_window();
+                            }),
+                    ),
             )
     }
 }
