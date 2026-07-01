@@ -1,5 +1,5 @@
 /// デザインシステムのトークン定義
-/// 
+///
 /// ここでは、デザインシステムで使用する基本的なトークンを定義します。
 
 pub const COLOR_BASE: u32 = 0x333333;
@@ -33,6 +33,8 @@ pub const SPACE_XL: f32 = 32.0;
 
 /// ヘッダー高さ定義
 pub const HEADER_HEIGHT: f32 = 32.0;
+pub const HEADER_ICON_HEIGHT: f32 = 24.0;
+pub const HEADER_ICON_SIZE: f32 = 20.0;
 
 ///　ボーダー半径定義
 pub const BORDER_RADIUS_SM: f32 = 2.0;
