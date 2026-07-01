@@ -22,10 +22,19 @@ impl Header {
             .bg(rgb(COLOR_GRAY_10))
             .px(px(SPACE_MD))
             .child(
-                div()
-                    .text_sm()
-                    .text_color(rgb(COLOR_TEXT))
-                    .child(self.title.clone()),
+                div().child(
+                    div()
+                        .flex()
+                        .items_center()
+                        .gap(px(SPACE_MD))
+                        .child(img(PathBuf::from("assets/main_logo/datto_logo.svg")).size(px(24.0)))
+                        .child(
+                            div()
+                                .text_sm()
+                                .text_color(rgb(COLOR_TEXT))
+                                .child(self.title.clone()),
+                        ),
+                ),
             )
             .child(
                 div()
@@ -37,11 +46,12 @@ impl Header {
                             .flex()
                             .justify_center()
                             .items_center()
+                            .hover(|style| style.bg(rgb(COLOR_GRAY_20)))
                             .child(
                                 img(PathBuf::from("assets/window/minimize_window.svg"))
                                     .size(px(20.0)),
                             )
-                            .on_mouse_down(MouseButton::Left, move |_, window, _| {
+                            .on_mouse_down(MouseButton::Left, |_, window, _| {
                                 window.minimize_window();
                             }),
                     )
@@ -51,11 +61,12 @@ impl Header {
                             .flex()
                             .justify_center()
                             .items_center()
+                            .hover(|style| style.bg(rgb(COLOR_GRAY_20)))
                             .child(
                                 img(PathBuf::from("assets/window/fullscreen_window.svg"))
                                     .size(px(20.0)),
                             )
-                            .on_mouse_down(MouseButton::Left, move |_, window, _| {
+                            .on_mouse_down(MouseButton::Left, |_, window, _| {
                                 window.zoom_window();
                             }),
                     )
@@ -65,10 +76,11 @@ impl Header {
                             .flex()
                             .justify_center()
                             .items_center()
+                            .hover(|style| style.bg(rgb(COLOR_DANGER)))
                             .child(
                                 img(PathBuf::from("assets/window/close_window.svg")).size(px(20.0)),
                             )
-                            .on_mouse_down(MouseButton::Left, move |_, window, _| {
+                            .on_mouse_down(MouseButton::Left, |_, window, _| {
                                 window.remove_window();
                             }),
                     ),
