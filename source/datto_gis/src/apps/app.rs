@@ -1,19 +1,19 @@
-use std::sync::Arc;
 use gpui::*;
+use std::sync::Arc;
 
 use crate::apps::templates::main_window::MainTemplate;
-use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
 use crate::domain::design_token_config::*;
+use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
 
 pub struct App;
 
 impl Render for App {
-    fn render(&mut self, window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .size_full()
             .bg(rgb(COLOR_BASE))
             .text_color(rgb(COLOR_TEXT))
-            .child(MainTemplate::render(window))
+            .child(MainTemplate::render(window, cx))
     }
 }
 

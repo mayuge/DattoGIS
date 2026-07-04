@@ -3,6 +3,7 @@ use gpui::*;
 use crate::domain::app_config::*;
 use crate::domain::design_token_config::HEADER_HEIGHT;
 
+use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::map_app::MapApp;
 
 use crate::components::atoms::button::*;
@@ -11,11 +12,11 @@ use crate::components::molecules::header::*;
 pub struct MainTemplate;
 
 impl MainTemplate {
-    pub fn render(window: &mut Window) -> impl IntoElement {
+    pub fn render(window: &mut Window, cx: &mut Context<AppState>) -> impl IntoElement {
         div()
             .relative()
             .size_full()
-            .child(div().absolute().inset_0().child(MapApp::render(window)))
+            .child(div().absolute().inset_0().child(MapApp::render(window, cx)))
             .child(
                 div()
                     .absolute()
