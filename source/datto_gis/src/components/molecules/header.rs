@@ -21,16 +21,22 @@ impl Header {
             .w_full()
             .bg(rgb(COLOR_GRAY_10))
             .px(px(SPACE_MD))
+            .border_b(px(1.0))
+            .border_color(rgb(COLOR_GRAY_60))
             .child(
                 div().child(
                     div()
                         .flex()
                         .items_center()
                         .gap(px(SPACE_MD))
-                        .child(img(PathBuf::from("assets/main_logo/datto_logo.svg")).size(px(HEADER_ICON_HEIGHT)))
+                        .child(
+                            img(PathBuf::from("assets/main_logo/datto_logo.svg"))
+                                .size(px(HEADER_ICON_HEIGHT)),
+                        )
                         .child(
                             div()
-                                .text_sm()
+                                .text_xs()
+                                .font_weight(FontWeight::BOLD)
                                 .text_color(rgb(COLOR_TEXT))
                                 .child(self.title.clone()),
                         ),
@@ -78,7 +84,8 @@ impl Header {
                             .items_center()
                             .hover(|style| style.bg(rgb(COLOR_DANGER)))
                             .child(
-                                img(PathBuf::from("assets/window/close_window.svg")).size(px(HEADER_ICON_SIZE)),
+                                img(PathBuf::from("assets/window/close_window.svg"))
+                                    .size(px(HEADER_ICON_SIZE)),
                             )
                             .on_mouse_down(MouseButton::Left, |_, window, _| {
                                 window.remove_window();
