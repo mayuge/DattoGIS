@@ -32,11 +32,31 @@ impl MapApp {
         let drag_state_for_mouse_down = drag_state.clone();
         let drag_state_for_mouse_move = drag_state.clone();
         let drag_state_for_mouse_up = drag_state.clone();
-        let map_state_for_handlers = map_state.clone();
+        let map_state_for_scroll = map_state.clone();
+        let map_state_for_drag = map_state.clone();
 
         div()
             .relative()
             .size_full()
+            .on_scroll_wheel(move |event, window, cx| {
+                let delta = match event.delta {
+                    ScrollDelta::Pixels(delta) => f32::from(delta.y),
+                    ScrollDelta::Lines(delta) => delta.y * 20.0,
+                };
+
+                map_state_for_scroll.update(cx, |map, _| {
+                    let zoom_step = if delta > 0.0 {
+                        1.0
+                    } else if delta < 0.0 {
+                        -1.0
+                    } else {
+                        0.0
+                    };
+                    map.zoom_level = (map.zoom_level + zoom_step).clamp(2.0, 18.0);
+                });
+
+                window.refresh();
+            })
             .on_mouse_down(MouseButton::Left, move |event, window, cx| {
                 drag_state_for_mouse_down.update(cx, |state, _| {
                     state.is_dragging = true;
@@ -58,7 +78,7 @@ impl MapApp {
                 let delta_x = f32::from(delta.x) as f64;
                 let delta_y = f32::from(delta.y) as f64;
 
-                map_state_for_handlers.update(cx, |map, _| {
+                map_state_for_drag.update(cx, |map, _| {
                     let zoom_level = map.zoom_level.round() as u32;
                     let world_size = RASTER_TILE_SIZE as f64 * (1u32 << zoom_level) as f64;
                     let pixels_per_degree_longitude = world_size / 360.0;
