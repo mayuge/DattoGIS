@@ -1,71 +1,78 @@
-//! タイル座標変換とURL生成ロジック
-use crate::domain::map_config::{MAP_MAX_LATITUDE, MAP_MIN_LATITUDE};
-use super::use_map_instance::{Coordinate, MapInstance};
+use super::use_map_instance::MapInstance;
+use super::use_map_world_pixel::WorldPixel;
 
-/// タイルURL生成の trait
-pub trait TileUrlGenerator {
-    /// タイルURLテンプレートの `{z}`、`{x}`、`{y}` を置換して返す
-    ///
-    /// # Arguments
-    ///
-    /// * `tile_url` - 生成に使うタイルURLテンプレート
-    fn generate_tile_url(&self, tile_url: &str) -> String;
+use crate::domain::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
+
+/// 描画するラスタータイル情報
+#[derive(Debug, Clone)]
+pub struct MapTile {
+    /// タイル列番号
+    pub tile_column: u32,
+
+    /// タイル行番号
+    pub tile_row: u32,
+
+    /// ズームレベル
+    pub zoom_level: u32,
+
+    /// 描画位置X座標
+    pub draw_x: f32,
+
+    /// 描画位置Y座標
+    pub draw_y: f32,
 }
 
-impl TileUrlGenerator for MapInstance {
-    fn generate_tile_url(&self, tile_url: &str) -> String {
-        let rounded_zoom_level = self.zoom_level.round().max(0.0) as u32;
-        let (tile_x, tile_y) = convert_tile_from_coordinate(&self.center, rounded_zoom_level);
+impl MapTile {
+    /// 表示するラスタータイル一覧を計算する
+    pub fn calculate_visible_tiles(
+        map: &MapInstance,
+        viewport_width: f32,
+        viewport_height: f32,
+    ) -> Vec<Self> {
+        let zoom_level = map.zoom_level.round() as u32;
 
-        tile_url
-            .replace("{z}", &rounded_zoom_level.to_string())
-            .replace("{x}", &tile_x.to_string())
-            .replace("{y}", &tile_y.to_string())
+        let world_pixel = WorldPixel::from_coordinate(&map.center, zoom_level);
+
+        let center_tile_column = world_pixel.tile_column() as i32;
+        let center_tile_row = world_pixel.tile_row() as i32;
+
+        let pixel_offset_x = world_pixel.pixel_offset_x() as f32;
+        let pixel_offset_y = world_pixel.pixel_offset_y() as f32;
+
+        // 画面に必要なタイル枚数（余白を追加）
+        let visible_tile_count_x =
+            (viewport_width / RASTER_TILE_SIZE as f32).ceil() as i32 + RASTER_TILE_OVERSCAN * 2;
+
+        let visible_tile_count_y =
+            (viewport_height / RASTER_TILE_SIZE as f32).ceil() as i32 + RASTER_TILE_OVERSCAN * 2;
+
+        let mut visible_tiles = Vec::new();
+
+        for row_offset in -visible_tile_count_y / 2..=visible_tile_count_y / 2 {
+            for column_offset in -visible_tile_count_x / 2..=visible_tile_count_x / 2 {
+                let tile_column = center_tile_column + column_offset;
+                let tile_row = center_tile_row + row_offset;
+
+                if tile_column < 0 || tile_row < 0 {
+                    continue;
+                }
+
+                let draw_x = viewport_width / 2.0 - pixel_offset_x
+                    + column_offset as f32 * RASTER_TILE_SIZE as f32;
+
+                let draw_y = viewport_height / 2.0 - pixel_offset_y
+                    + row_offset as f32 * RASTER_TILE_SIZE as f32;
+
+                visible_tiles.push(Self {
+                    tile_column: tile_column as u32,
+                    tile_row: tile_row as u32,
+                    zoom_level,
+                    draw_x,
+                    draw_y,
+                });
+            }
+        }
+
+        visible_tiles
     }
 }
-
-/// 座標からWeb Mercatorタイルインデックスを計算する
-///
-/// # Arguments
-///
-/// * `center` - 中心座標
-/// * `zoom_level` - ズームレベル
-///
-/// # Returns
-///
-/// タイルX座標とY座標のタプル
-fn convert_tile_from_coordinate(center: &Coordinate, zoom_level: u32) -> (u32, u32) {
-    // Web Mercator のタイル座標は経度を [0, 360] 度に変換し、
-    // 緯度は正規化した値を扱う必要がある
-    let normalized_longitude = center.longitude.clamp(-180.0, 180.0);
-    let normalized_latitude = center.latitude.clamp(MAP_MIN_LATITUDE, MAP_MAX_LATITUDE);
-    let tile_count = 2_u32.pow(zoom_level);
-
-    // 経度からタイルX座標を計算
-    let tile_x = ((normalized_longitude + 180.0) / 360.0 * tile_count as f64).floor();
-    let tile_x = if tile_x < 0.0 {
-        0
-    } else if tile_x >= tile_count as f64 {
-        tile_count - 1
-    } else {
-        tile_x as u32
-    };
-
-    // 緯度からタイルY座標を計算（メルカトル図法）
-    let latitude_radians = normalized_latitude.to_radians();
-    let tile_y = ((1.0
-        - (latitude_radians.tan() + 1.0 / latitude_radians.cos()).ln() / std::f64::consts::PI)
-        / 2.0
-        * tile_count as f64)
-        .floor();
-    let tile_y = if tile_y < 0.0 {
-        0
-    } else if tile_y >= tile_count as f64 {
-        tile_count - 1
-    } else {
-        tile_y as u32
-    };
-
-    (tile_x, tile_y)
-}
-

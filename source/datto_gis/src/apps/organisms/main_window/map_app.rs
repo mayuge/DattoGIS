@@ -1,3 +1,5 @@
+use crate::services::map::use_map_instance::MapInstance;
+use crate::services::map::use_map_tile::MapTile;
 use gpui::*;
 use std::path::PathBuf;
 
