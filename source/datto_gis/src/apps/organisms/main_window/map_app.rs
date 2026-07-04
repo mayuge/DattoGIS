@@ -9,21 +9,14 @@ use std::path::PathBuf;
 pub struct MapApp;
 
 impl MapApp {
-    pub fn render(_window: &mut Window) -> impl IntoElement {
+    pub fn render(window: &mut Window) -> impl IntoElement {
         let map = MapInstance::default();
 
-        let viewport_width = 1280.0;
-        let viewport_height = 720.0;
+        let viewport = window.viewport_size();
+        let viewport_width = f32::from(viewport.width);
+        let viewport_height = f32::from(viewport.height);
 
         let visible_tiles = MapTile::calculate_visible_tiles(&map, viewport_width, viewport_height);
-
-        println!(
-            "visible_tiles: {:?}",
-            visible_tiles
-                .iter()
-                .map(|tile| tile.generate_tile_url(DEFAULT_RASTER_TILE_URL))
-                .collect::<Vec<String>>()
-        );
 
         div()
             .relative()
