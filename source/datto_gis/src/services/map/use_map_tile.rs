@@ -23,6 +23,13 @@ pub struct MapTile {
 }
 
 impl MapTile {
+    /// タイルURLを生成する
+    pub fn generate_tile_url(&self, tile_url: &str) -> String {
+        tile_url
+            .replace("{z}", &self.zoom_level.to_string())
+            .replace("{x}", &self.tile_column.to_string())
+            .replace("{y}", &self.tile_row.to_string())
+    }
     /// 表示するラスタータイル一覧を計算する
     pub fn calculate_visible_tiles(
         map: &MapInstance,
