@@ -37,18 +37,12 @@ impl MapApp {
         let map_state_for_drag = map_state.clone();
 
         div()
-            .relative()
-            .size_full()
+            .absolute()
+            .top(px(HEADER_HEIGHT))
+            .bottom_0()
+            .left(px(LAYER_CONTROLLER_WIDTH))
+            .right_0()
             .on_scroll_wheel(move |event, window, cx| {
-                // 現在位置がヘッダーの領域と重なっている場合は操作を無効化する
-                if event.position.y < HEADER_HEIGHT.into() {
-                    return;
-                }
-                //現在位置がレイヤーコントローラの領域と重なっている場合は操作を無効化する
-                if event.position.x < LAYER_CONTROLLER_WIDTH.into() {
-                    return;
-                }
-
                 let delta = match event.delta {
                     ScrollDelta::Pixels(delta) => f32::from(delta.y),
                     ScrollDelta::Lines(delta) => delta.y * 20.0,
@@ -83,15 +77,6 @@ impl MapApp {
                 let Some(last_position) = drag_state_for_mouse_move.read(cx).last_position else {
                     return;
                 };
-
-                // 現在位置がヘッダーの領域と重なっている場合はドラッグ操作を無効化する
-                if event.position.y < HEADER_HEIGHT.into() {
-                    return;
-                }
-                //現在位置がレイヤーコントローラの領域と重なっている場合はドラッグ操作を無効化する
-                if event.position.x < LAYER_CONTROLLER_WIDTH.into() {
-                    return;
-                }
 
                 let delta = event.position - last_position;
                 let delta_x = f32::from(delta.x) as f64;
