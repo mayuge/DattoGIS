@@ -1,6 +1,7 @@
 use gpui::*;
 
 use crate::apps::app::App as AppState;
+use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::map_config::{
     DEFAULT_RASTER_TILE_URL, MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE,
 };
@@ -69,10 +70,19 @@ impl MapApp {
                 if !dragging {
                     return;
                 }
-
+                // マウスの前回位置を取得
                 let Some(last_position) = drag_state_for_mouse_move.read(cx).last_position else {
                     return;
                 };
+
+                // 現在位置がヘッダーの領域と重なっている場合はドラッグ操作を無効化する
+                if event.position.y < HEADER_HEIGHT.into() {
+                    return;
+                }
+                //現在位置がレイヤーコントローラの領域と重なっている場合はドラッグ操作を無効化する
+                if event.position.x < LAYER_CONTROLLER_WIDTH.into() {
+                    return;
+                }
 
                 let delta = event.position - last_position;
                 let delta_x = f32::from(delta.x) as f64;

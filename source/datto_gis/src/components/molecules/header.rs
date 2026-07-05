@@ -13,15 +13,18 @@ impl Header {
 
     pub fn render(&self, window: &mut Window) -> impl IntoElement {
         div()
+            .absolute()
+            .top_0()
+            .left_0()
+            .h(px(HEADER_HEIGHT))
             .flex()
             .window_control_area(WindowControlArea::Drag)
             .justify_between()
             .items_center()
-            .h(px(HEADER_HEIGHT))
             .w_full()
-            .bg(rgb(COLOR_GRAY_10))
+            .bg(rgb(COLOR_COMPONENT_BASE))
             .px(px(SPACE_MD))
-            .border_b(px(1.0))
+            .border_b(px(BORDER_WEIGHT))
             .border_color(rgb(COLOR_GRAY_60))
             .child(
                 div().child(

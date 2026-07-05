@@ -3,6 +3,7 @@
 /// ここでは、デザインシステムで使用する基本的なトークンを定義します。
 
 pub const COLOR_BASE: u32 = 0x4d4d4d;
+pub const COLOR_COMPONENT_BASE: u32 = 0x1a1a1a;
 pub const COLOR_TEXT: u32 = 0xcccccc;
 
 /// カラーパレット定義
@@ -37,7 +38,13 @@ pub const HEADER_HEIGHT: f32 = 32.0;
 pub const HEADER_ICON_HEIGHT: f32 = 24.0;
 pub const HEADER_ICON_SIZE: f32 = 20.0;
 
+///レイヤーコントローラの幅定義
+pub const LAYER_CONTROLLER_WIDTH: f32 = 250.0;
+
 ///　ボーダー半径定義
 pub const BORDER_RADIUS_SM: f32 = 2.0;
 pub const BORDER_RADIUS_MD: f32 = 4.0;
 pub const BORDER_RADIUS_LG: f32 = 8.0;
+
+///　ボーダー太さ定義
+pub const BORDER_WEIGHT: f32 = 1.0;
