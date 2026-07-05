@@ -40,6 +40,15 @@ impl MapApp {
             .relative()
             .size_full()
             .on_scroll_wheel(move |event, window, cx| {
+                // 現在位置がヘッダーの領域と重なっている場合は操作を無効化する
+                if event.position.y < HEADER_HEIGHT.into() {
+                    return;
+                }
+                //現在位置がレイヤーコントローラの領域と重なっている場合は操作を無効化する
+                if event.position.x < LAYER_CONTROLLER_WIDTH.into() {
+                    return;
+                }
+
                 let delta = match event.delta {
                     ScrollDelta::Pixels(delta) => f32::from(delta.y),
                     ScrollDelta::Lines(delta) => delta.y * 20.0,

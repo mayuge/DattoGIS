@@ -39,7 +39,7 @@ pub const HEADER_ICON_HEIGHT: f32 = 24.0;
 pub const HEADER_ICON_SIZE: f32 = 20.0;
 
 ///レイヤーコントローラの幅定義
-pub const LAYER_CONTROLLER_WIDTH: f32 = 250.0;
+pub const LAYER_CONTROLLER_WIDTH: f32 = 200.0;
 
 ///　ボーダー半径定義
 pub const BORDER_RADIUS_SM: f32 = 2.0;
