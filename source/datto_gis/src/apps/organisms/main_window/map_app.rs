@@ -1,7 +1,10 @@
 use gpui::*;
 
 use crate::apps::app::App as AppState;
-use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
+use crate::domain::design_token_config::{
+    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, FOOTER_HEIGHT, HEADER_HEIGHT,
+    LAYER_CONTROLLER_WIDTH,
+};
 use crate::domain::map_config::{
     DEFAULT_RASTER_TILE_URL, MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE,
 };
@@ -120,6 +123,18 @@ impl MapApp {
                     .w(px(RASTER_TILE_SIZE as f32))
                     .h(px(RASTER_TILE_SIZE as f32))
             }))
+            //フッター
+            .child(
+                div()
+                    .absolute()
+                    .bottom_0()
+                    .left_0()
+                    .h(px(FOOTER_HEIGHT))
+                    .w_full()
+                    .bg(rgb(COLOR_COMPONENT_BASE))
+                    .border_t(px(BORDER_WEIGHT))
+                    .border_color(rgb(COLOR_GRAY_60)),
+            )
             // クロスヘア
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))
