@@ -30,8 +30,18 @@ impl MapApp {
         let viewport = window.viewport_size();
         let viewport_width = f32::from(viewport.width);
         let viewport_height = f32::from(viewport.height);
+        let map_viewport_width = viewport_width - LAYER_CONTROLLER_WIDTH;
+        let map_viewport_height = viewport_height - HEADER_HEIGHT;
+        let coordinate_display = SharedString::from(format!(
+            "{:.4}, {:.4}",
+            map.center.latitude, map.center.longitude
+        ));
 
-        let visible_tiles = MapTile::calculate_visible_tiles(&map, viewport_width, viewport_height);
+        let visible_tiles = MapTile::calculate_visible_tiles(
+            &map,
+            map_viewport_width,
+            map_viewport_height,
+        );
 
         let drag_state_for_mouse_down = drag_state.clone();
         let drag_state_for_mouse_move = drag_state.clone();
@@ -133,7 +143,16 @@ impl MapApp {
                     .w_full()
                     .bg(rgb(COLOR_COMPONENT_BASE))
                     .border_t(px(BORDER_WEIGHT))
-                    .border_color(rgb(COLOR_GRAY_60)),
+                    .border_color(rgb(COLOR_GRAY_60))
+                    .flex()
+                    .items_center()
+                    .child(
+                        div()
+                            .absolute()
+                            .text_xs()
+                            .right(px(2.0))
+                            .child(coordinate_display),
+                    ),
             )
             // クロスヘア
             .child(
