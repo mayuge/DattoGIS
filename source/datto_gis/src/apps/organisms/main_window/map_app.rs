@@ -1,17 +1,14 @@
 use gpui::*;
 
 use crate::apps::app::App as AppState;
-use crate::domain::design_token_config::{
-    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, FOOTER_HEIGHT, HEADER_HEIGHT,
-    LAYER_CONTROLLER_WIDTH,
-};
+use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::map_config::{
     DEFAULT_RASTER_TILE_URL, MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE,
 };
 use crate::services::map::use_map_instance::MapInstance;
 use crate::services::map::use_map_tile::MapTile;
-
-use std::path::PathBuf;
+use gpui::SharedString;
+use std::rc::Rc;
 
 #[derive(Default)]
 struct DragState {
@@ -22,7 +19,11 @@ struct DragState {
 pub struct MapApp;
 
 impl MapApp {
-    pub fn render(window: &mut Window, cx: &mut Context<AppState>) -> impl IntoElement {
+    pub fn render(
+        window: &mut Window,
+        cx: &mut Context<AppState>,
+        set_coordinate: Rc<dyn Fn(&mut gpui::App, SharedString)>,
+    ) -> impl IntoElement {
         let map_state = window.use_state(cx, |_, _| MapInstance::default());
         let drag_state = window.use_state(cx, |_, _| DragState::default());
 
@@ -32,22 +33,17 @@ impl MapApp {
         let viewport_height = f32::from(viewport.height);
         let map_viewport_width = viewport_width - LAYER_CONTROLLER_WIDTH;
         let map_viewport_height = viewport_height - HEADER_HEIGHT;
-        let coordinate_display = SharedString::from(format!(
-            "{:.4}, {:.4}",
-            map.center.latitude, map.center.longitude
-        ));
 
-        let visible_tiles = MapTile::calculate_visible_tiles(
-            &map,
-            map_viewport_width,
-            map_viewport_height,
-        );
+        let visible_tiles =
+            MapTile::calculate_visible_tiles(&map, map_viewport_width, map_viewport_height);
 
         let drag_state_for_mouse_down = drag_state.clone();
         let drag_state_for_mouse_move = drag_state.clone();
         let drag_state_for_mouse_up = drag_state.clone();
         let map_state_for_scroll = map_state.clone();
         let map_state_for_drag = map_state.clone();
+        let set_coordinate_for_scroll = set_coordinate.clone();
+        let set_coordinate_for_drag = set_coordinate.clone();
 
         div()
             .absolute()
@@ -71,6 +67,15 @@ impl MapApp {
                     };
                     map.zoom_level = (map.zoom_level + zoom_step).clamp(2.0, 18.0);
                 });
+                // update footer coordinate after zoom change
+                let map_now = map_state_for_scroll.read(cx).clone();
+                (set_coordinate_for_scroll.as_ref())(
+                    cx,
+                    SharedString::from(format!(
+                        "{:.4}, {:.4}",
+                        map_now.center.latitude, map_now.center.longitude
+                    )),
+                );
 
                 window.refresh();
             })
@@ -109,6 +114,16 @@ impl MapApp {
                         .clamp(MAP_MIN_LATITUDE, MAP_MAX_LATITUDE);
                 });
 
+                // update footer coordinate after drag
+                let map_now = map_state_for_drag.read(cx).clone();
+                (set_coordinate_for_drag.as_ref())(
+                    cx,
+                    SharedString::from(format!(
+                        "{:.4}, {:.4}",
+                        map_now.center.latitude, map_now.center.longitude
+                    )),
+                );
+
                 drag_state_for_mouse_move.update(cx, |state, _| {
                     state.last_position = Some(event.position);
                 });
@@ -133,37 +148,5 @@ impl MapApp {
                     .w(px(RASTER_TILE_SIZE as f32))
                     .h(px(RASTER_TILE_SIZE as f32))
             }))
-            //フッター
-            .child(
-                div()
-                    .absolute()
-                    .bottom_0()
-                    .left_0()
-                    .h(px(FOOTER_HEIGHT))
-                    .w_full()
-                    .bg(rgb(COLOR_COMPONENT_BASE))
-                    .border_t(px(BORDER_WEIGHT))
-                    .border_color(rgb(COLOR_GRAY_60))
-                    .flex()
-                    .items_center()
-                    .child(
-                        div()
-                            .absolute()
-                            .text_xs()
-                            .right(px(2.0))
-                            .child(coordinate_display),
-                    ),
-            )
-            // クロスヘア
-            .child(
-                img(PathBuf::from("assets/map/crosshair.svg"))
-                    .absolute()
-                    .top_1_2()
-                    .left_1_2()
-                    .w(px(32.0))
-                    .h(px(32.0))
-                    .ml(px(-16.0))
-                    .mt(px(-16.0)),
-            )
     }
 }
