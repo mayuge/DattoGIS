@@ -22,6 +22,7 @@ impl MapApp {
     pub fn render(
         window: &mut Window,
         cx: &mut Context<AppState>,
+        raster_url: &str,
         set_coordinate: Rc<dyn Fn(&mut gpui::App, SharedString)>,
     ) -> impl IntoElement {
         let map_state = window.use_state(cx, |_, _| MapInstance::default());
@@ -65,7 +66,7 @@ impl MapApp {
                     } else {
                         0.0
                     };
-                    map.zoom_level = (map.zoom_level + zoom_step).clamp(2.0, 18.0);
+                    map.zoom_level = (map.zoom_level + zoom_step);
                 });
                 // update footer coordinate after zoom change
                 let map_now = map_state_for_scroll.read(cx).clone();
@@ -139,7 +140,7 @@ impl MapApp {
             })
             // ラスタータイル
             .children(visible_tiles.into_iter().map(|tile| {
-                let url = tile.generate_tile_url(DEFAULT_RASTER_TILE_URL);
+                let url = tile.generate_tile_url(raster_url);
 
                 img(SharedString::from(url))
                     .absolute()

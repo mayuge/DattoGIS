@@ -2,6 +2,7 @@ use gpui::*;
 
 use crate::domain::app_config::*;
 use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
+use crate::domain::map_config::DEFAULT_RASTER_TILE_URL;
 
 use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
@@ -38,6 +39,7 @@ impl MainTemplate {
             .child(div().absolute().inset_0().child(MapApp::render(
                 window,
                 cx,
+                DEFAULT_RASTER_TILE_URL,
                 set_coordinate.clone(),
             )))
             .child(LayerControllerApp::render(window, cx))
