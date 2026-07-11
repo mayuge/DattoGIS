@@ -10,7 +10,7 @@ impl Footer {
         Self { text }
     }
 
-    pub fn render(&self, _window: &mut Window) -> impl IntoElement {
+    pub fn render(&self) -> impl IntoElement {
         div()
             .absolute()
             .bottom_0()

@@ -1,15 +1,16 @@
 use gpui::*;
 
 use crate::domain::app_config::*;
-use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
+use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH, SPACE_SM};
 use crate::domain::map_config::DEFAULT_RASTER_TILE_URL;
 
 use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
 use crate::apps::organisms::main_window::map_app::MapApp;
 
-use crate::components::molecules::footer::Footer;
-use crate::components::molecules::header::*;
+use crate::components::atoms::footer::Footer;
+use crate::components::atoms::header::Header;
+use crate::components::atoms::search_input::SearchInput;
 use gpui::App as GpuiApp;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -43,8 +44,14 @@ impl MainTemplate {
                 set_coordinate.clone(),
             )))
             .child(LayerControllerApp::render(window, cx))
-            .child(Header::new(APP_NAME.to_string()).render(window))
-            .child(Footer::new(coordinate_display.read(cx).clone()).render(window))
+            .child(Header::new(APP_NAME.to_string()).render())
+            .child(
+                div()
+                    .flex()
+                    .justify_center()
+                    .child(SearchInput::new().render()),
+            )
+            .child(Footer::new(coordinate_display.read(cx).clone()).render())
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))
                     .absolute()

@@ -2,9 +2,7 @@ use gpui::*;
 
 use crate::apps::app::App as AppState;
 use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
-use crate::domain::map_config::{
-    DEFAULT_RASTER_TILE_URL, MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE,
-};
+use crate::domain::map_config::{MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE};
 use crate::services::map::use_map_instance::MapInstance;
 use crate::services::map::use_map_tile::MapTile;
 use gpui::SharedString;
@@ -66,7 +64,7 @@ impl MapApp {
                     } else {
                         0.0
                     };
-                    map.zoom_level = (map.zoom_level + zoom_step);
+                    map.zoom_level = map.zoom_level + zoom_step;
                 });
                 // update footer coordinate after zoom change
                 let map_now = map_state_for_scroll.read(cx).clone();

@@ -11,7 +11,7 @@ impl Header {
         Self { title }
     }
 
-    pub fn render(&self, window: &mut Window) -> impl IntoElement {
+    pub fn render(&self) -> impl IntoElement {
         div()
             .absolute()
             .top_0()
