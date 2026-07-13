@@ -15,7 +15,7 @@ pub const COLOR_SUCCESS: u32 = 0x52c41a;
 pub const COLOR_WARNING: u32 = 0xfa5b01;
 pub const COLOR_DANGER: u32 = 0xff4d4f;
 
-/// グレー定義
+/// グレー定義 明度%
 pub const COLOR_GRAY_10: u32 = 0x1a1a1a;
 pub const COLOR_GRAY_20: u32 = 0x333333;
 pub const COLOR_GRAY_30: u32 = 0x4d4d4d;
@@ -43,6 +43,10 @@ pub const FOOTER_HEIGHT: f32 = 24.0;
 
 ///レイヤーコントローラの幅定義
 pub const LAYER_CONTROLLER_WIDTH: f32 = 250.0;
+
+///アクティビティバーの幅定義
+pub const ACTIVITY_BAR_WIDTH: f32 = 32.0;
+pub const ACTIVITY_BAR_ICON_SIZE: f32 = 24.0;
 
 ///　ボーダー半径定義
 pub const BORDER_RADIUS_SM: f32 = 2.0;

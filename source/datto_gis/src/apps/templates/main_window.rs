@@ -1,16 +1,18 @@
 use gpui::*;
 
 use crate::domain::app_config::*;
-use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH, SPACE_SM};
+use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::map_config::DEFAULT_RASTER_TILE_URL;
 
 use crate::apps::app::App as AppState;
+use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
 use crate::apps::organisms::main_window::map_app::MapApp;
 
 use crate::components::atoms::footer::Footer;
 use crate::components::atoms::header::Header;
 use crate::components::atoms::search_input::SearchInput;
+
 use gpui::App as GpuiApp;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -44,6 +46,7 @@ impl MainTemplate {
                 set_coordinate.clone(),
             )))
             .child(LayerControllerApp::render(window, cx))
+            .child(ActivityBarApp::render())
             .child(Header::new(APP_NAME.to_string()).render())
             .child(
                 div()
