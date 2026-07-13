@@ -20,7 +20,6 @@ impl ActivityBarApp {
             .items_center()
             .border_r(px(BORDER_WEIGHT))
             .border_color(rgb(COLOR_GRAY_60))
-            .bg(rgb(COLOR_COMPONENT_BASE))
             .gap(px(SPACE_MD))
             .child(
                 img(PathBuf::from("assets/activity_bar/file.svg"))
