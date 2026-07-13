@@ -42,10 +42,10 @@ pub const HEADER_ICON_SIZE: f32 = 20.0;
 pub const FOOTER_HEIGHT: f32 = 24.0;
 
 ///レイヤーコントローラの幅定義
-pub const LAYER_CONTROLLER_WIDTH: f32 = 250.0;
+pub const LAYER_CONTROLLER_WIDTH: f32 = 300.0;
 
 ///アクティビティバーの幅定義
-pub const ACTIVITY_BAR_WIDTH: f32 = 32.0;
+pub const ACTIVITY_BAR_WIDTH: f32 = 40.0;
 pub const ACTIVITY_BAR_ICON_SIZE: f32 = 24.0;
 
 ///　ボーダー半径定義
