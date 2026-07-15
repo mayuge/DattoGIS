@@ -5,8 +5,13 @@ use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::map_config::{MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE};
 use crate::services::map::use_map_instance::MapInstance;
 use crate::services::map::use_map_tile::MapTile;
-use gpui::SharedString;
-use std::rc::Rc;
+
+fn coordinate_text(map: &MapInstance) -> SharedString {
+    SharedString::from(format!(
+        "{:.4}, {:.4}",
+        map.center.latitude, map.center.longitude
+    ))
+}
 
 #[derive(Default)]
 struct DragState {
@@ -21,7 +26,6 @@ impl MapApp {
         window: &mut Window,
         cx: &mut Context<AppState>,
         raster_url: &str,
-        set_coordinate: Rc<dyn Fn(&mut gpui::App, SharedString)>,
     ) -> impl IntoElement {
         let map_state = window.use_state(cx, |_, _| MapInstance::default());
         let drag_state = window.use_state(cx, |_, _| DragState::default());
@@ -41,8 +45,8 @@ impl MapApp {
         let drag_state_for_mouse_up = drag_state.clone();
         let map_state_for_scroll = map_state.clone();
         let map_state_for_drag = map_state.clone();
-        let set_coordinate_for_scroll = set_coordinate.clone();
-        let set_coordinate_for_drag = set_coordinate.clone();
+        let app_entity_for_scroll = cx.entity();
+        let app_entity_for_drag = cx.entity();
 
         div()
             .absolute()
@@ -66,15 +70,12 @@ impl MapApp {
                     };
                     map.zoom_level = map.zoom_level + zoom_step;
                 });
-                // update footer coordinate after zoom change
+
                 let map_now = map_state_for_scroll.read(cx).clone();
-                (set_coordinate_for_scroll.as_ref())(
-                    cx,
-                    SharedString::from(format!(
-                        "{:.4}, {:.4}",
-                        map_now.center.latitude, map_now.center.longitude
-                    )),
-                );
+                app_entity_for_scroll.update(cx, |app, cx| {
+                    app.coordinate = coordinate_text(&map_now);
+                    cx.notify();
+                });
 
                 window.refresh();
             })
@@ -112,17 +113,12 @@ impl MapApp {
                         + delta_y / pixels_per_degree_latitude)
                         .clamp(MAP_MIN_LATITUDE, MAP_MAX_LATITUDE);
                 });
-
-                // update footer coordinate after drag
                 let map_now = map_state_for_drag.read(cx).clone();
-                (set_coordinate_for_drag.as_ref())(
-                    cx,
-                    SharedString::from(format!(
-                        "{:.4}, {:.4}",
-                        map_now.center.latitude, map_now.center.longitude
-                    )),
-                );
 
+                app_entity_for_drag.update(cx, |app, cx| {
+                    app.coordinate = coordinate_text(&map_now);
+                    cx.notify();
+                });
                 drag_state_for_mouse_move.update(cx, |state, _| {
                     state.last_position = Some(event.position);
                 });

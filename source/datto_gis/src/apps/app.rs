@@ -5,7 +5,10 @@ use crate::apps::templates::main_window::MainTemplate;
 use crate::domain::design_token_config::*;
 use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
 
-pub struct App;
+#[derive(Default)]
+pub struct App {
+    pub coordinate: SharedString,
+}
 
 impl Render for App {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
@@ -13,7 +16,7 @@ impl Render for App {
             .size_full()
             .bg(rgb(COLOR_BASE))
             .text_color(rgb(COLOR_TEXT))
-            .child(MainTemplate::render(window, cx))
+            .child(MainTemplate::render(window, cx, self.coordinate.clone()))
     }
 }
 
@@ -31,7 +34,7 @@ pub fn create_app() {
                 titlebar: None,
                 ..Default::default()
             },
-            |_window, cx| cx.new(|_| App),
+            |_window, cx| cx.new(|_| App::default()),
         )
         .unwrap();
     });
