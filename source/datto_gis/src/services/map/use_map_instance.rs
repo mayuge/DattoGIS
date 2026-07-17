@@ -34,26 +34,3 @@ impl Default for MapInstance {
         }
     }
 }
-
-impl MapInstance {
-    /// 指定した値で地図状態を生成する
-    ///
-    /// # Arguments
-    ///
-    /// * `center` - 地図の中心座標
-    /// * `zoom_level` - 地図のズームレベル
-    pub fn new(center: Coordinate, zoom_level: f64) -> Self {
-        Self { center, zoom_level }
-    }
-
-    /// 地図状態を更新する
-    ///
-    /// # Arguments
-    ///
-    /// * `center` - 更新後の中心座標
-    /// * `zoom_level` - 更新後のズームレベル
-    pub fn update(&mut self, center: Coordinate, zoom_level: f64) {
-        self.center = center;
-        self.zoom_level = zoom_level;
-    }
-}

@@ -1,8 +1,8 @@
 use gpui::*;
 
 use crate::domain::app_config::*;
-use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::map_config::DEFAULT_RASTER_TILE_URL;
+use crate::services::map::use_map_area::MapArea;
 
 use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
@@ -24,10 +24,10 @@ impl MainTemplate {
         coordinate: SharedString,
     ) -> impl IntoElement {
         let viewport = window.viewport_size();
-        let viewport_width = f32::from(viewport.width);
-        let viewport_height = f32::from(viewport.height);
-        let map_viewport_width = viewport_width - LAYER_CONTROLLER_WIDTH;
-        let map_viewport_height = viewport_height - HEADER_HEIGHT;
+        let map_viewport =
+            MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
+        // クロスヘア表示位置を取得
+        let (crosshair_x, crosshair_y) = map_viewport.get_map_area_center();
 
         div()
             .relative()
@@ -47,11 +47,12 @@ impl MainTemplate {
                     .child(SearchInput::new().render()),
             )
             .child(Footer::new(coordinate).render())
+            //クロスヘアを配置
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))
                     .absolute()
-                    .top(px(HEADER_HEIGHT + map_viewport_height / 2.0))
-                    .left(px(LAYER_CONTROLLER_WIDTH + map_viewport_width / 2.0))
+                    .top(px(crosshair_y))
+                    .left(px(crosshair_x))
                     .w(px(32.0))
                     .h(px(32.0))
                     .ml(px(-16.0))
