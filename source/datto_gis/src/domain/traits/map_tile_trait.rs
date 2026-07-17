@@ -1,6 +1,6 @@
 use crate::services::map::use_map_instance::MapInstance;
 
-pub trait MapTileUseCase: Sized {
+pub trait MapTileTrait: Sized {
     fn generate_tile_url(&self, tile_url: &str) -> String;
     fn calculate_visible_tiles(
         map: &MapInstance,

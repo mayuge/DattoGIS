@@ -1,11 +1,11 @@
 use crate::domain::map_config::{MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE};
-use crate::domain::traits::map_event::MapEventUseCase;
+use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::services::map::use_map_instance::MapInstance;
 
 /// 地図描画部分でのイベントの計算
 pub struct MapEvent;
 
-impl MapEventUseCase for MapEvent {
+impl MapEventTrait for MapEvent {
     fn zoom_by_scroll(map: &mut MapInstance, scroll_delta_y: f32) {
         let zoom_step = if scroll_delta_y > 0.0 {
             1.0
