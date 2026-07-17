@@ -8,6 +8,7 @@ pub struct SearchInput {
     text: String,
 }
 
+//検索用入力欄
 impl SearchInput {
     pub fn new() -> Self {
         Self {
@@ -16,27 +17,23 @@ impl SearchInput {
     }
 
     pub fn render(&self) -> impl IntoElement {
-        div()
-            .h(px(HEADER_HEIGHT))
-            .flex()
-            .items_center() // HEADER_HEIGHT内で上下中央
-            .child(
-                div()
-                    .w(px(400.0))
-                    .h(px(HEADER_ICON_HEIGHT))
-                    .border_1()
-                    .border_color(rgb(COLOR_GRAY_50))
-                    .rounded(px(BORDER_RADIUS_MD))
-                    .bg(rgb(COLOR_GRAY_20))
-                    .flex()
-                    .items_center()
-                    .pl(px(SPACE_SM))
-                    .text_xs()
-                    .child(if self.text.is_empty() {
-                        SEARCH_PLACEHOLDER.to_owned()
-                    } else {
-                        self.text.clone()
-                    }),
-            )
+        div().h(px(HEADER_HEIGHT)).flex().items_center().child(
+            div()
+                .w(px(400.0))
+                .h(px(HEADER_ICON_HEIGHT))
+                .border_1()
+                .border_color(rgb(COLOR_GRAY_50))
+                .rounded(px(BORDER_RADIUS_MD))
+                .bg(rgb(COLOR_GRAY_20))
+                .flex()
+                .items_center()
+                .pl(px(SPACE_SM))
+                .text_xs()
+                .child(if self.text.is_empty() {
+                    SEARCH_PLACEHOLDER.to_owned()
+                } else {
+                    self.text.clone()
+                }),
+        )
     }
 }

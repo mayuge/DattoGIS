@@ -2,6 +2,8 @@ use super::use_map_instance::MapInstance;
 use super::use_map_world_pixel::WorldPixel;
 
 use crate::domain::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
+use crate::domain::traits::map_tile::MapTileUseCase;
+use crate::domain::traits::world_pixel::WorldPixelUseCase;
 
 /// 描画するラスタータイル情報
 #[derive(Debug, Clone)]
@@ -22,16 +24,16 @@ pub struct MapTile {
     pub draw_y: f32,
 }
 
-impl MapTile {
+impl MapTileUseCase for MapTile {
     /// タイルURLを生成する
-    pub fn generate_tile_url(&self, tile_url: &str) -> String {
+    fn generate_tile_url(&self, tile_url: &str) -> String {
         tile_url
             .replace("{z}", &self.zoom_level.to_string())
             .replace("{x}", &self.tile_column.to_string())
             .replace("{y}", &self.tile_row.to_string())
     }
     /// 表示するラスタータイル一覧を計算する
-    pub fn calculate_visible_tiles(
+    fn calculate_visible_tiles(
         map: &MapInstance,
         viewport_width: f32,
         viewport_height: f32,

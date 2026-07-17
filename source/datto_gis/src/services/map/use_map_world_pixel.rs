@@ -3,6 +3,7 @@
 use super::use_map_instance::Coordinate;
 
 use crate::domain::map_config::{MAP_MAX_LATITUDE, MAP_MIN_LATITUDE, RASTER_TILE_SIZE};
+use crate::domain::traits::world_pixel::WorldPixelUseCase;
 
 #[derive(Debug, Clone, Copy)]
 pub struct WorldPixel {
@@ -10,8 +11,8 @@ pub struct WorldPixel {
     pub pixel_y: f64,
 }
 
-impl WorldPixel {
-    pub fn from_coordinate(coordinate: &Coordinate, zoom_level: u32) -> Self {
+impl WorldPixelUseCase for WorldPixel {
+    fn from_coordinate(coordinate: &Coordinate, zoom_level: u32) -> Self {
         let longitude = coordinate.longitude.clamp(-180.0, 180.0);
         let latitude = coordinate
             .latitude
@@ -31,19 +32,19 @@ impl WorldPixel {
         Self { pixel_x, pixel_y }
     }
 
-    pub fn tile_column(&self) -> u32 {
+    fn tile_column(&self) -> u32 {
         (self.pixel_x / RASTER_TILE_SIZE as f64).floor() as u32
     }
 
-    pub fn tile_row(&self) -> u32 {
+    fn tile_row(&self) -> u32 {
         (self.pixel_y / RASTER_TILE_SIZE as f64).floor() as u32
     }
 
-    pub fn pixel_offset_x(&self) -> f64 {
+    fn pixel_offset_x(&self) -> f64 {
         self.pixel_x % RASTER_TILE_SIZE as f64
     }
 
-    pub fn pixel_offset_y(&self) -> f64 {
+    fn pixel_offset_y(&self) -> f64 {
         self.pixel_y % RASTER_TILE_SIZE as f64
     }
 }
