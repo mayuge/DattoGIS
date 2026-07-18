@@ -33,6 +33,7 @@ impl MapTileTrait for MapTile {
             .replace("{y}", &self.tile_row.to_string())
     }
     /// 表示するラスタータイル一覧を計算する
+    /// マップインスタンス（xyz）、画面の幅、高さが渡される
     fn calculate_visible_tiles(
         map: &MapInstance,
         viewport_width: f32,
@@ -48,7 +49,8 @@ impl MapTileTrait for MapTile {
         let pixel_offset_x = world_pixel.pixel_offset_x() as f32;
         let pixel_offset_y = world_pixel.pixel_offset_y() as f32;
 
-        // 画面に必要なタイル枚数（余白を追加）
+        //画面に必要なタイル枚数（余白を追加）
+        //余白は左右、上下セットなので2倍する
         let visible_tile_count_x =
             (viewport_width / RASTER_TILE_SIZE as f32).ceil() as i32 + RASTER_TILE_OVERSCAN * 2;
 
@@ -65,10 +67,10 @@ impl MapTileTrait for MapTile {
                 if tile_column < 0 || tile_row < 0 {
                     continue;
                 }
-
+                //描画位置は、中心を指定するため２で割る
                 let draw_x = viewport_width / 2.0 - pixel_offset_x
                     + column_offset as f32 * RASTER_TILE_SIZE as f32;
-
+                //描画位置は、中心を指定するため２で割る
                 let draw_y = viewport_height / 2.0 - pixel_offset_y
                     + row_offset as f32 * RASTER_TILE_SIZE as f32;
 

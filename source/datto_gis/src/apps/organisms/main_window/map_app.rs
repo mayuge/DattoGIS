@@ -2,7 +2,7 @@ use gpui::*;
 
 use crate::apps::app::App as AppState;
 use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
-use crate::domain::params::map_config::RASTER_TILE_SIZE;
+use crate::domain::params::map_config::{MAP_SCROLL_LINE_DELTA_PIXELS, RASTER_TILE_SIZE};
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
@@ -55,7 +55,7 @@ impl MapApp {
             .on_scroll_wheel(move |event, window, cx| {
                 let delta = match event.delta {
                     ScrollDelta::Pixels(delta) => f32::from(delta.y),
-                    ScrollDelta::Lines(delta) => delta.y * 20.0,
+                    ScrollDelta::Lines(delta) => delta.y * MAP_SCROLL_LINE_DELTA_PIXELS,
                 };
 
                 map_state_for_scroll.update(cx, |map, _| MapEvent::zoom_by_scroll(map, delta));

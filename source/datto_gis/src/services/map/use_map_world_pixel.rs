@@ -10,7 +10,10 @@ pub struct WorldPixel {
 
 impl WorldPixelTrait for WorldPixel {
     fn convert_coordinate_to_pixel(coordinate: &WebMercatorCoordinate, zoom_level: u32) -> Self {
+        // 256px*2^zoom_level(タイルの大きさ×枚数)
+        //タイルの一辺の枚数は2のzoom_level乗,0なら1枚、5なら32枚
         let world_size = RASTER_TILE_SIZE * (1u32 << zoom_level) as f64;
+        //WEB_MERCATOR_HALF_WORLD_WIDTHはπrなので2倍で直径になる
         let world_width = WEB_MERCATOR_HALF_WORLD_WIDTH * 2.0;
 
         let pixel_x = (coordinate.x + WEB_MERCATOR_HALF_WORLD_WIDTH) / world_width * world_size;
