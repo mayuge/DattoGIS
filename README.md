@@ -1,4 +1,13 @@
-## dattogis
+<img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=header&text=datto_gis&fontSize=90&animation=fadeIn&fontAlignY=38&descAlignY=51&descAlign=62"/>
+
+## gisとは
+- GIS（Geographic Information System：地理情報システム）とは、位置や空間に関する情報（空間データ）をコンピュータ上のデジタル地図と結びつけ、データの管理、分析、視覚化を行うシステム
+
+## datto_gis
+- datto_gisの由来
+  - 「脱兎の如く」の慣用句のように、速く、きびきびと動作すること
+  -  他のGISソフトを打倒するようなものになってほしい
+  -  ロゴはウサギをかたどったもの。rust製なのrustのRとrabbitのR同じだよね!
 
 ## 実行方法
 - 1.Rustの実行環境を整える

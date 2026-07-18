@@ -1,3 +1,5 @@
+//現時点ではターミナルを出さないので、gui画面だけを出すための設定
+#![windows_subsystem = "windows"]
 mod apps;
 mod components;
 //ドメインフォルダ内は、未使用でもwarningを出さない
