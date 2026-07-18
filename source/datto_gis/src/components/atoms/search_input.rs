@@ -3,6 +3,7 @@ use crate::domain::params::design_token_config::{
 };
 use crate::domain::params::text_config::SEARCH_PLACEHOLDER;
 use gpui::*;
+use std::path::PathBuf;
 
 pub struct SearchInput {
     text: String,
@@ -29,6 +30,7 @@ impl SearchInput {
                 .items_center()
                 .pl(px(SPACE_SM))
                 .text_xs()
+                .child(img(PathBuf::from("assets/components/search.svg")))
                 .child(if self.text.is_empty() {
                     SEARCH_PLACEHOLDER.to_owned()
                 } else {
