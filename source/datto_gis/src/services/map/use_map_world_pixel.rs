@@ -1,6 +1,6 @@
-use crate::domain::map_config::{RASTER_TILE_SIZE, WEB_MERCATOR_HALF_WORLD_WIDTH};
-use crate::domain::map_coordinate::WebMercatorCoordinate;
+use crate::domain::params::map_config::{RASTER_TILE_SIZE, WEB_MERCATOR_HALF_WORLD_WIDTH};
 use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
+use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 
 #[derive(Debug, Clone, Copy)]
 pub struct WorldPixel {

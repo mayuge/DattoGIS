@@ -1,7 +1,7 @@
-use crate::domain::design_token_config::{
+use crate::domain::params::design_token_config::{
     BORDER_RADIUS_MD, COLOR_GRAY_20, COLOR_GRAY_50, HEADER_HEIGHT, HEADER_ICON_HEIGHT, SPACE_SM,
 };
-use crate::domain::text_config::SEARCH_PLACEHOLDER;
+use crate::domain::params::text_config::SEARCH_PLACEHOLDER;
 use gpui::*;
 
 pub struct SearchInput {

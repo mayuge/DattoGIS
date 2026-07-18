@@ -1,4 +1,4 @@
-use crate::domain::map_coordinate::WebMercatorCoordinate;
+use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 
 pub trait WorldPixelTrait: Sized {
     fn convert_coordinate_to_pixel(coordinate: &WebMercatorCoordinate, zoom_level: u32) -> Self;

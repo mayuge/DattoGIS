@@ -1,12 +1,12 @@
 use gpui::*;
 
 use crate::apps::app::App as AppState;
-use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
-use crate::domain::map_config::RASTER_TILE_SIZE;
-use crate::domain::map_coordinate::WebMercatorCoordinate;
+use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
+use crate::domain::params::map_config::RASTER_TILE_SIZE;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
+use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_event::MapEvent;
 use crate::services::map::use_map_instance::MapInstance;

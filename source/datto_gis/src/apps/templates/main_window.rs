@@ -1,9 +1,9 @@
 use gpui::*;
 
-use crate::domain::app_config::*;
-use crate::domain::map_config::DEFAULT_RASTER_TILE_URL;
-use crate::domain::map_coordinate::WebMercatorCoordinate;
+use crate::domain::params::app_config::*;
+use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
+use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 use crate::services::map::use_map_area::MapArea;
 
 use crate::apps::app::App as AppState;

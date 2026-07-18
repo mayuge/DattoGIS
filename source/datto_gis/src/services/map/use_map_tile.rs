@@ -1,7 +1,7 @@
 use super::use_map_instance::MapInstance;
 use super::use_map_world_pixel::WorldPixel;
 
-use crate::domain::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
+use crate::domain::params::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
 

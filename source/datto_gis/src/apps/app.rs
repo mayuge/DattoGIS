@@ -2,10 +2,10 @@ use gpui::*;
 use std::sync::Arc;
 
 use crate::apps::templates::main_window::MainTemplate;
-use crate::domain::design_token_config::*;
-use crate::domain::map_config::{MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE};
-use crate::domain::map_coordinate::{WebMercatorCoordinate, Wgs84Coordinate};
+use crate::domain::params::design_token_config::*;
+use crate::domain::params::map_config::{MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE};
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
+use crate::domain::types::map_coordinate::{WebMercatorCoordinate, Wgs84Coordinate};
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
 

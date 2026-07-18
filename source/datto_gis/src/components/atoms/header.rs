@@ -1,4 +1,4 @@
-use crate::domain::design_token_config::*;
+use crate::domain::params::design_token_config::*;
 use gpui::*;
 use std::path::PathBuf;
 

@@ -1,6 +1,6 @@
-use crate::domain::design_token_config::*;
-use crate::domain::map_coordinate::WebMercatorCoordinate;
+use crate::domain::params::design_token_config::*;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
+use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use gpui::*;
 
@@ -36,12 +36,6 @@ impl Footer {
             .border_color(rgb(COLOR_GRAY_60))
             .flex()
             .items_center()
-            .child(
-                div()
-                    .absolute()
-                    .text_xs()
-                    .right(px(2.0))
-                    .child(text),
-            )
+            .child(div().absolute().text_xs().right(px(2.0)).child(text))
     }
 }

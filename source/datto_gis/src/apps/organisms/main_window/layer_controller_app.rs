@@ -1,5 +1,5 @@
 use crate::apps::app::App as AppState;
-use crate::domain::design_token_config::{
+use crate::domain::params::design_token_config::{
     BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, LAYER_CONTROLLER_WIDTH,
 };
 use gpui::*;

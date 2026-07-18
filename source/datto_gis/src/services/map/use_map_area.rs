@@ -1,4 +1,4 @@
-use crate::domain::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
+use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 
 /// 地図表示領域のサイズを管理する

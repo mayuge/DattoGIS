@@ -1,4 +1,4 @@
-use crate::domain::design_token_config::{
+use crate::domain::params::design_token_config::{
     ACTIVITY_BAR_ICON_SIZE, ACTIVITY_BAR_WIDTH, BORDER_WEIGHT, COLOR_GRAY_20, COLOR_GRAY_60,
     HEADER_HEIGHT, SPACE_MD,
 };
