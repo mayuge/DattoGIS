@@ -2,6 +2,7 @@ use gpui::*;
 
 use crate::domain::app_config::*;
 use crate::domain::map_config::DEFAULT_RASTER_TILE_URL;
+use crate::domain::map_coordinate::WebMercatorCoordinate;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::services::map::use_map_area::MapArea;
 
@@ -22,7 +23,7 @@ impl MainTemplate {
     pub fn render(
         window: &mut Window,
         cx: &mut Context<AppState>,
-        coordinate: SharedString,
+        map_center: WebMercatorCoordinate,
     ) -> impl IntoElement {
         let viewport = window.viewport_size();
         let map_viewport =
@@ -37,6 +38,7 @@ impl MainTemplate {
                 window,
                 cx,
                 DEFAULT_RASTER_TILE_URL,
+                map_center,
             )))
             .child(LayerControllerApp::render(window, cx))
             .child(ActivityBarApp::render())
@@ -47,7 +49,7 @@ impl MainTemplate {
                     .justify_center()
                     .child(SearchInput::new().render()),
             )
-            .child(Footer::new(coordinate).render())
+            .child(Footer::new(map_center).render())
             //クロスヘアを配置
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))

@@ -10,6 +10,8 @@ pub const MAP_MIN_LATITUDE: f64 = -85.05112878;
 /// Web Mercatorで扱える最大緯度
 pub const MAP_MAX_LATITUDE: f64 = 85.05112878;
 
+pub const WEB_MERCATOR_HALF_WORLD_WIDTH: f64 = 20_037_508.342_789_244;
+
 /// 初期ズームレベル
 pub const MAP_ZOOM_LEVEL: f64 = 5.0;
 
