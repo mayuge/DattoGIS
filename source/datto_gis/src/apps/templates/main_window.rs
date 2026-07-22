@@ -3,8 +3,8 @@ use gpui::*;
 use crate::domain::params::app_config::*;
 use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
-use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 use crate::services::map::use_map_area::MapArea;
+use crate::services::map::use_map_instance::MapInstance;
 
 use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
@@ -23,7 +23,7 @@ impl MainTemplate {
     pub fn render(
         window: &mut Window,
         cx: &mut Context<AppState>,
-        map_center: WebMercatorCoordinate,
+        map: MapInstance,
     ) -> impl IntoElement {
         let viewport = window.viewport_size();
         let map_viewport =
@@ -38,7 +38,7 @@ impl MainTemplate {
                 window,
                 cx,
                 DEFAULT_RASTER_TILE_URL,
-                map_center,
+                map.clone(),
             )))
             .child(LayerControllerApp::render(window, cx))
             .child(ActivityBarApp::render())
@@ -49,7 +49,7 @@ impl MainTemplate {
                     .justify_center()
                     .child(SearchInput::new().render()),
             )
-            .child(Footer::new(map_center).render())
+            .child(Footer::new(map).render())
             //クロスヘアを配置
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))

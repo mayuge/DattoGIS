@@ -1,26 +1,26 @@
 use crate::domain::params::design_token_config::*;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
-use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
+use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
 
 pub struct Footer {
-    map_center: WebMercatorCoordinate,
+    map: MapInstance,
 }
 
 impl Footer {
-    pub fn new(map_center: WebMercatorCoordinate) -> Self {
-        Self { map_center }
+    pub fn new(map: MapInstance) -> Self {
+        Self { map }
     }
 
     pub fn render(&self) -> impl IntoElement {
         let transformer = ProjCoreCoordinateTransformer;
         let text = transformer
-            .web_mercator_to_wgs84(self.map_center)
+            .web_mercator_to_wgs84(self.map.center)
             .map(|coordinate| {
                 SharedString::from(format!(
-                    "{:.4}, {:.4}",
-                    coordinate.latitude_deg, coordinate.longitude_deg
+                    "{:.4}, {:.4} | Zoom: {:.1}",
+                    coordinate.latitude_deg, coordinate.longitude_deg, self.map.zoom_level
                 ))
             })
             .unwrap_or_else(|_| SharedString::from("座標変換エラー"));

@@ -6,7 +6,6 @@ use crate::domain::params::map_config::{MAP_SCROLL_LINE_DELTA_PIXELS, RASTER_TIL
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
-use crate::domain::types::map_coordinate::WebMercatorCoordinate;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_event::MapEvent;
 use crate::services::map::use_map_instance::MapInstance;
@@ -25,9 +24,9 @@ impl MapApp {
         window: &mut Window,
         cx: &mut Context<AppState>,
         raster_url: &str,
-        initial_center: WebMercatorCoordinate,
+        initial_map: MapInstance,
     ) -> impl IntoElement {
-        let map_state = window.use_state(cx, |_, _| MapInstance::new(initial_center));
+        let map_state = window.use_state(cx, |_, _| initial_map);
         let drag_state = window.use_state(cx, |_, _| DragState::default());
 
         let map = map_state.read(cx).clone();
@@ -62,7 +61,7 @@ impl MapApp {
 
                 let map_now = map_state_for_scroll.read(cx).clone();
                 app_entity_for_scroll.update(cx, |app, cx| {
-                    app.map_center = map_now.center;
+                    app.map = map_now;
                     cx.notify();
                 });
 
@@ -94,7 +93,7 @@ impl MapApp {
                 let map_now = map_state_for_drag.read(cx).clone();
 
                 app_entity_for_drag.update(cx, |app, cx| {
-                    app.map_center = map_now.center;
+                    app.map = map_now;
                     cx.notify();
                 });
                 drag_state_for_mouse_move.update(cx, |state, _| {
