@@ -1,4 +1,7 @@
-use crate::domain::params::design_token_config::*;
+use crate::domain::params::design_token_config::{
+    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_DANGER, COLOR_GRAY_20, COLOR_GRAY_60, HEADER_HEIGHT,
+    HEADER_ICON_HEIGHT, HEADER_ICON_SIZE, SPACE_MD, SPACE_SM,
+};
 use gpui::*;
 use std::path::PathBuf;
 
@@ -40,7 +43,6 @@ impl Header {
                             div()
                                 .text_xs()
                                 .font_weight(FontWeight::BOLD)
-                                .text_color(rgb(COLOR_TEXT))
                                 .child(self.title.clone()),
                         ),
                 ),

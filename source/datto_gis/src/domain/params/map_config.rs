@@ -4,17 +4,15 @@ pub const MAP_CENTER_LONGITUDE: f64 = 137.0;
 /// 初期表示中心緯度
 pub const MAP_CENTER_LATITUDE: f64 = 38.5;
 
-
 ///Annex D: Common TileMatrixSet definitions (Informative)
 ///BBOX LowerCorner: -20037508.3427892 -20037508.3427892 (lat/long: -85.0511287798,-180)
 ///BBOX UpperCorner: 20037508.3427892 20037508.3427892 (lat/long: 85.0511287798,180)
 
 /// Web Mercatorで扱える最小緯度
-pub const MAP_MIN_LATITUDE: f64 = -85.05112878;
+pub const MAP_MIN_LATITUDE: f64 = -85.0511287798;
 
 /// Web Mercatorで扱える最大緯度
-pub const MAP_MAX_LATITUDE: f64 = 85.05112878;
-
+pub const MAP_MAX_LATITUDE: f64 = 85.0511287798;
 
 /// Web Mercator（EPSG:3857）における、原点から世界端までの距離（メートル）。
 ///

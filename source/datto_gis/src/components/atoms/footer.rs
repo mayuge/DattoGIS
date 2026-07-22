@@ -1,4 +1,7 @@
-use crate::domain::params::design_token_config::*;
+use crate::domain::params::design_token_config::{
+    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, FOOTER_HEIGHT, SPACE_MD,
+};
+use crate::domain::params::map_config::DATA_PROJ_EPSG;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::services::map::use_map_instance::MapInstance;
@@ -16,11 +19,11 @@ impl Footer {
     pub fn render(&self) -> impl IntoElement {
         let transformer = ProjCoreCoordinateTransformer;
         let text = transformer
-            .web_mercator_to_wgs84(self.map.center)
+            .web_mercator_to_epsg_coordinate(self.map.center, DATA_PROJ_EPSG)
             .map(|coordinate| {
                 SharedString::from(format!(
-                    "{:.4}, {:.4} | Zoom: {:.1}",
-                    coordinate.latitude_deg, coordinate.longitude_deg, self.map.zoom_level
+                    "{:.4}, {:.4} | Zoom: {:.1} | EPSG: {}",
+                    coordinate.x, coordinate.y, self.map.zoom_level, coordinate.epsg,
                 ))
             })
             .unwrap_or_else(|_| SharedString::from("座標変換エラー"));

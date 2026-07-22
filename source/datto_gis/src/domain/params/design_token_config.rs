@@ -48,6 +48,14 @@ pub const LAYER_CONTROLLER_WIDTH: f32 = 300.0;
 pub const ACTIVITY_BAR_WIDTH: f32 = 40.0;
 pub const ACTIVITY_BAR_ICON_SIZE: f32 = 24.0;
 
+///デフォルトウィンドウサイズ（初期値）
+pub const DEFAULT_WINDOW_WIDTH: f32 = 1280.0;
+pub const DEFAULT_WINDOW_HEIGHT: f32 = 720.0;
+
+///最小ウィンドウサイズ
+pub const MIN_WINDOW_WIDTH: f32 = 800.0;
+pub const MIN_WINDOW_HEIGHT: f32 = 600.0;
+
 ///　ボーダー半径定義
 pub const BORDER_RADIUS_SM: f32 = 2.0;
 pub const BORDER_RADIUS_MD: f32 = 4.0;

@@ -2,10 +2,15 @@ use gpui::*;
 use std::sync::Arc;
 
 use crate::apps::templates::main_window::MainTemplate;
-use crate::domain::params::design_token_config::{COLOR_BASE, COLOR_TEXT};
-use crate::domain::params::map_config::{MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE};
+use crate::domain::params::design_token_config::{
+    COLOR_BASE, COLOR_TEXT, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, MIN_WINDOW_HEIGHT,
+    MIN_WINDOW_WIDTH,
+};
+use crate::domain::params::map_config::{
+    DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
+};
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
-use crate::domain::types::map_coordinate::{WebMercatorCoordinate, Wgs84Coordinate};
+use crate::domain::types::map_coordinate::{EpsgCoordinate, WebMercatorCoordinate};
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
 use crate::services::map::use_map_instance::MapInstance;
@@ -36,9 +41,10 @@ impl Render for App {
 pub fn create_app() {
     let coordinate_transformer = ProjCoreCoordinateTransformer;
     let map_center = coordinate_transformer
-        .wgs84_to_web_mercator(Wgs84Coordinate {
-            longitude_deg: MAP_CENTER_LONGITUDE,
-            latitude_deg: MAP_CENTER_LATITUDE,
+        .epsg_coordinate_to_web_mercator(EpsgCoordinate {
+            x: MAP_CENTER_LONGITUDE,
+            y: MAP_CENTER_LATITUDE,
+            epsg: DATA_PROJ_EPSG,
         })
         .expect("failed to convert initial map center to Web Mercator");
 
@@ -52,6 +58,12 @@ pub fn create_app() {
         cx.open_window(
             WindowOptions {
                 titlebar: None,
+                window_bounds: Some(WindowBounds::Windowed(Bounds::centered(
+                    None,
+                    size(px(DEFAULT_WINDOW_WIDTH), px(DEFAULT_WINDOW_HEIGHT)),
+                    cx,
+                ))),
+                window_min_size: Some(size(px(MIN_WINDOW_WIDTH), px(MIN_WINDOW_HEIGHT))),
                 ..Default::default()
             },
             |_window, cx| cx.new(|_| App::new(map_center)),
