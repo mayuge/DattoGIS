@@ -1,7 +1,9 @@
 use super::use_map_instance::MapInstance;
 use super::use_map_world_pixel::WorldPixel;
 
-use crate::domain::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
+use crate::domain::params::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
+use crate::domain::traits::map_tile_trait::MapTileTrait;
+use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
 
 /// 描画するラスタータイル情報
 #[derive(Debug, Clone)]
@@ -22,23 +24,24 @@ pub struct MapTile {
     pub draw_y: f32,
 }
 
-impl MapTile {
+impl MapTileTrait for MapTile {
     /// タイルURLを生成する
-    pub fn generate_tile_url(&self, tile_url: &str) -> String {
+    fn generate_tile_url(&self, tile_url: &str) -> String {
         tile_url
             .replace("{z}", &self.zoom_level.to_string())
             .replace("{x}", &self.tile_column.to_string())
             .replace("{y}", &self.tile_row.to_string())
     }
     /// 表示するラスタータイル一覧を計算する
-    pub fn calculate_visible_tiles(
+    /// マップインスタンス（xyz）、画面の幅、高さが渡される
+    fn calculate_visible_tiles(
         map: &MapInstance,
         viewport_width: f32,
         viewport_height: f32,
     ) -> Vec<Self> {
         let zoom_level = map.zoom_level.round() as u32;
 
-        let world_pixel = WorldPixel::from_coordinate(&map.center, zoom_level);
+        let world_pixel = WorldPixel::convert_coordinate_to_pixel(&map.center, zoom_level);
 
         let center_tile_column = world_pixel.tile_column() as i32;
         let center_tile_row = world_pixel.tile_row() as i32;
@@ -46,7 +49,8 @@ impl MapTile {
         let pixel_offset_x = world_pixel.pixel_offset_x() as f32;
         let pixel_offset_y = world_pixel.pixel_offset_y() as f32;
 
-        // 画面に必要なタイル枚数（余白を追加）
+        //画面に必要なタイル枚数（余白を追加）
+        //余白は左右、上下セットなので2倍する
         let visible_tile_count_x =
             (viewport_width / RASTER_TILE_SIZE as f32).ceil() as i32 + RASTER_TILE_OVERSCAN * 2;
 
@@ -63,10 +67,10 @@ impl MapTile {
                 if tile_column < 0 || tile_row < 0 {
                     continue;
                 }
-
+                //描画位置は、中心を指定するため２で割る
                 let draw_x = viewport_width / 2.0 - pixel_offset_x
                     + column_offset as f32 * RASTER_TILE_SIZE as f32;
-
+                //描画位置は、中心を指定するため２で割る
                 let draw_y = viewport_height / 2.0 - pixel_offset_y
                     + row_offset as f32 * RASTER_TILE_SIZE as f32;
 

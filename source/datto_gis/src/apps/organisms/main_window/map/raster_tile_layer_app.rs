@@ -1,0 +1,35 @@
+use crate::domain::params::map_config::RASTER_TILE_SIZE;
+use crate::domain::traits::map_tile_trait::MapTileTrait;
+use crate::domain::types::map_layer_type::RasterTileLayer;
+use crate::services::map::use_map_instance::MapInstance;
+use crate::services::map::use_map_tile::MapTile;
+use gpui::*;
+
+pub struct RasterTileLayerApp;
+
+impl RasterTileLayerApp {
+    pub fn render(
+        visible_tiles: Vec<MapTile>,
+        raster_tile_layers: Vec<RasterTileLayer>,
+    ) -> impl IntoElement {
+        div().children(
+            raster_tile_layers
+                .into_iter()
+                .filter(|layer| layer.visible)
+                .flat_map(|layer| {
+                    let opacity = layer.opacity;
+                    let url = layer.url.clone();
+
+                    visible_tiles.iter().map(move |tile| {
+                        img(SharedString::from(tile.generate_tile_url(&url)))
+                            .absolute()
+                            .left(px(tile.draw_x))
+                            .top(px(tile.draw_y))
+                            .w(px(RASTER_TILE_SIZE as f32))
+                            .h(px(RASTER_TILE_SIZE as f32))
+                            .opacity(opacity)
+                    })
+                }),
+        )
+    }
+}

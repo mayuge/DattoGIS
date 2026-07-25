@@ -5,10 +5,11 @@ edition = "2024"
 
 [dependencies]
 gpui = "0.2.2"
-geojson = "1.0.0"
 gpui_http_client = "0.2.2"
-reqwest = { version = "0.12.28", features = ["blocking"] }
-anyhow = "1.0"
-futures = "0.3"
+reqwest = { version = "0.13.4", features = ["blocking"] }
+anyhow = "1.0.104"
+futures = "0.3.33"
 http = "1.0"
 url = "2.5"
+proj-core = "0.9.0"
+duckdb = { version = "1.10505.0", features = ["bundled"] }

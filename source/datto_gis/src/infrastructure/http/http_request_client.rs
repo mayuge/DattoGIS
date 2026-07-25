@@ -1,7 +1,7 @@
 use anyhow::Result;
 use futures::future::BoxFuture;
 use gpui_http_client::{AsyncBody, HttpClient, Response};
-use crate::domain::app_config::{APP_NAME};
+use crate::domain::params::app_config::{APP_NAME};
 
 pub struct ReqwestHttpClient {
     client: reqwest::blocking::Client,
