@@ -1,5 +1,5 @@
 use crate::domain::params::design_token_config::{
-    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, FOOTER_HEIGHT, SPACE_MD,
+    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, FOOTER_HEIGHT,
 };
 use crate::domain::params::map_config::DATA_PROJ_EPSG;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;

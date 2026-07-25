@@ -1,5 +1,5 @@
 use crate::domain::params::map_config::MAP_ZOOM_LEVEL;
-use crate::domain::types::map_coordinate::WebMercatorCoordinate;
+use crate::domain::types::map_coordinate_type::WebMercatorCoordinate;
 
 #[derive(Debug, Clone)]
 pub struct MapInstance {

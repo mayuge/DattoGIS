@@ -7,22 +7,41 @@ use crate::domain::params::design_token_config::{
     MIN_WINDOW_WIDTH,
 };
 use crate::domain::params::map_config::{
-    DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
+    DATA_PROJ_EPSG, DEFAULT_RASTER_TILE_URL, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
 };
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
-use crate::domain::types::map_coordinate::{EpsgCoordinate, WebMercatorCoordinate};
+use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
+use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
 use crate::services::map::use_map_instance::MapInstance;
 
 pub struct App {
     pub map: MapInstance,
+    pub raster_tile_layers: Vec<RasterTileLayer>,
 }
 
 impl App {
     fn new(map_center: WebMercatorCoordinate) -> Self {
         Self {
             map: MapInstance::new(map_center),
+            raster_tile_layers: vec![
+                RasterTileLayer {
+                    id: "gsi".to_string(),
+                    name: "地理院地図".into(),
+                    url: DEFAULT_RASTER_TILE_URL.into(),
+                    opacity: 0.5,
+                    visible: true,
+                },
+                RasterTileLayer {
+                    id: "gsi-photo".to_string(),
+                    name: "航空写真".into(),
+                    url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
+                        .into(),
+                    opacity: 0.6,
+                    visible: true,
+                },
+            ],
         }
     }
 }
@@ -33,7 +52,12 @@ impl Render for App {
             .size_full()
             .bg(rgb(COLOR_BASE))
             .text_color(rgb(COLOR_TEXT))
-            .child(MainTemplate::render(window, cx, self.map.clone()))
+            .child(MainTemplate::render(
+                window,
+                cx,
+                self.map.clone(),
+                self.raster_tile_layers.clone(),
+            ))
     }
 }
 

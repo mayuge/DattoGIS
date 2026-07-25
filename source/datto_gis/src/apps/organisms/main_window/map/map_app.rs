@@ -1,11 +1,13 @@
 use gpui::*;
 
 use crate::apps::app::App as AppState;
+use crate::apps::organisms::main_window::map::raster_tile_layer_app::RasterTileLayerApp;
 use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::params::map_config::{MAP_SCROLL_LINE_DELTA_PIXELS, RASTER_TILE_SIZE};
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
+use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_event::MapEvent;
 use crate::services::map::use_map_instance::MapInstance;
@@ -23,10 +25,10 @@ impl MapApp {
     pub fn render(
         window: &mut Window,
         cx: &mut Context<AppState>,
-        raster_url: &str,
-        initial_map: MapInstance,
+        map_instance: MapInstance,
+        raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
-        let map_state = window.use_state(cx, |_, _| initial_map);
+        let map_state = window.use_state(cx, |_, _| map_instance);
         let drag_state = window.use_state(cx, |_, _| DragState::default());
 
         let map = map_state.read(cx).clone();
@@ -109,16 +111,11 @@ impl MapApp {
                 });
                 window.refresh();
             })
+            // レイヤー描画
             // ラスタータイル
-            .children(visible_tiles.into_iter().map(|tile| {
-                let url = tile.generate_tile_url(raster_url);
-
-                img(SharedString::from(url))
-                    .absolute()
-                    .left(px(tile.draw_x))
-                    .top(px(tile.draw_y))
-                    .w(px(RASTER_TILE_SIZE as f32))
-                    .h(px(RASTER_TILE_SIZE as f32))
-            }))
+            .child(RasterTileLayerApp::render(
+                visible_tiles,
+                raster_tile_layers,
+            ))
     }
 }

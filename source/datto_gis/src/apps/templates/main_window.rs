@@ -1,15 +1,15 @@
-use gpui::*;
-
 use crate::domain::params::app_config::*;
 use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
+use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_instance::MapInstance;
+use gpui::*;
 
 use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
-use crate::apps::organisms::main_window::map_app::MapApp;
+use crate::apps::organisms::main_window::map::map_app::MapApp;
 
 use crate::components::atoms::footer::Footer;
 use crate::components::atoms::header::Header;
@@ -23,7 +23,8 @@ impl MainTemplate {
     pub fn render(
         window: &mut Window,
         cx: &mut Context<AppState>,
-        map: MapInstance,
+        map_instance: MapInstance,
+        raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
         let viewport = window.viewport_size();
         let map_viewport =
@@ -37,8 +38,8 @@ impl MainTemplate {
             .child(div().absolute().inset_0().child(MapApp::render(
                 window,
                 cx,
-                DEFAULT_RASTER_TILE_URL,
-                map.clone(),
+                map_instance.clone(),
+                raster_tile_layers,
             )))
             .child(LayerControllerApp::render(window, cx))
             .child(ActivityBarApp::render())
@@ -49,7 +50,7 @@ impl MainTemplate {
                     .justify_center()
                     .child(SearchInput::new().render()),
             )
-            .child(Footer::new(map).render())
+            .child(Footer::new(map_instance).render())
             //クロスヘアを配置
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))

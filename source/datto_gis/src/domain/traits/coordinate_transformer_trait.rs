@@ -1,4 +1,4 @@
-use crate::domain::types::map_coordinate::{EpsgCoordinate, WebMercatorCoordinate};
+use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
 
 #[derive(Debug)]
 pub struct CoordinateTransformError(pub String);

@@ -3,7 +3,7 @@ use proj_core::Transform;
 use crate::domain::traits::coordinate_transformer_trait::{
     CoordinateTransformError, CoordinateTransformer,
 };
-use crate::domain::types::map_coordinate::{EpsgCoordinate, WebMercatorCoordinate};
+use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
 
 pub struct ProjCoreCoordinateTransformer;
 
