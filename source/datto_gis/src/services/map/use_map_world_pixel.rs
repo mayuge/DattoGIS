@@ -22,6 +22,22 @@ impl WorldPixelTrait for WorldPixel {
         Self { pixel_x, pixel_y }
     }
 
+    fn convert_pixel_to_coordinate(
+        pixel_x: f64,
+        pixel_y: f64,
+        zoom_level: u32,
+    ) -> WebMercatorCoordinate {
+        let world_size = RASTER_TILE_SIZE * (1u32 << zoom_level) as f64;
+
+        let world_width = WEB_MERCATOR_HALF_WORLD_WIDTH * 2.0;
+
+        let x = pixel_x / world_size * world_width - WEB_MERCATOR_HALF_WORLD_WIDTH;
+
+        let y = WEB_MERCATOR_HALF_WORLD_WIDTH - (pixel_y / world_size * world_width);
+
+        WebMercatorCoordinate { x, y }
+    }
+
     fn tile_column(&self) -> u32 {
         (self.pixel_x / RASTER_TILE_SIZE).floor() as u32
     }

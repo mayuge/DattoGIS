@@ -1,8 +1,8 @@
 /// 初期表示中心経度
-pub const MAP_CENTER_LONGITUDE: f64 = 137.0;
+pub const MAP_CENTER_LONGITUDE: f64 = 139.62286099196345;
 
 /// 初期表示中心緯度
-pub const MAP_CENTER_LATITUDE: f64 = 38.5;
+pub const MAP_CENTER_LATITUDE: f64 = 35.70538438612006;
 
 ///Annex D: Common TileMatrixSet definitions (Informative)
 ///BBOX LowerCorner: -20037508.3427892 -20037508.3427892 (lat/long: -85.0511287798,-180)
@@ -34,7 +34,7 @@ pub const MAP_MAX_LATITUDE: f64 = 85.0511287798;
 pub const WEB_MERCATOR_HALF_WORLD_WIDTH: f64 = 20_037_508.342_789_244;
 
 /// 初期ズームレベル
-pub const MAP_ZOOM_LEVEL: f64 = 5.0;
+pub const MAP_ZOOM_LEVEL: f64 = 18.0;
 
 /// ズームレベルの制限
 pub const MAP_MAX_ZOOM_LEVEL: f64 = 24.0;

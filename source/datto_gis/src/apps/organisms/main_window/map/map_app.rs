@@ -53,15 +53,17 @@ impl MapApp {
             .bottom_0()
             .left(px(LAYER_CONTROLLER_WIDTH))
             .right_0()
+            //ホイールイベント受け取りイベント
             .on_scroll_wheel(move |event, window, cx| {
                 let delta = match event.delta {
                     ScrollDelta::Pixels(delta) => f32::from(delta.y),
                     ScrollDelta::Lines(delta) => delta.y * MAP_SCROLL_LINE_DELTA_PIXELS,
                 };
-
+                //ホイール時のズーム
                 map_state_for_scroll.update(cx, |map, _| MapEvent::zoom_by_scroll(map, delta));
 
                 let map_now = map_state_for_scroll.read(cx).clone();
+
                 app_entity_for_scroll.update(cx, |app, cx| {
                     app.map = map_now;
                     cx.notify();
@@ -69,6 +71,7 @@ impl MapApp {
 
                 window.refresh();
             })
+            //マウスクリック時のイベント
             .on_mouse_down(MouseButton::Left, move |event, window, cx| {
                 drag_state_for_mouse_down.update(cx, |state, _| {
                     state.is_dragging = true;
@@ -76,6 +79,7 @@ impl MapApp {
                 });
                 window.refresh();
             })
+            //ドラッグ中のイベント
             .on_mouse_move(move |event, window, cx| {
                 let dragging = drag_state_for_mouse_move.read(cx).is_dragging;
                 if !dragging {
@@ -104,6 +108,7 @@ impl MapApp {
 
                 window.refresh();
             })
+            //ドラッグ終了時のイベント
             .on_mouse_up(MouseButton::Left, move |_, window, cx| {
                 drag_state_for_mouse_up.update(cx, |state, _| {
                     state.is_dragging = false;
