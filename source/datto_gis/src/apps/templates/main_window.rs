@@ -47,7 +47,7 @@ impl MainTemplate {
                 div()
                     .flex()
                     .justify_center()
-                    .child(cx.new(|cx| SearchInput::new())),
+                    .child(cx.new(|cx| SearchInput::new(window, cx))),
             )
             .child(Footer::new(map_instance).render())
             //クロスヘアを配置

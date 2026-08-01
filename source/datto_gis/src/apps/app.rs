@@ -1,4 +1,5 @@
 use gpui::*;
+use gpui_component::{init as init_gpui_component, Root};
 use gpui_platform::application;
 use std::sync::Arc;
 
@@ -76,6 +77,8 @@ pub fn create_app() {
         .expect("failed to convert initial map center to Web Mercator");
 
     application().run(move |cx| {
+        init_gpui_component(cx);
+
         #[cfg(not(target_family = "wasm"))]
         {
             let http_client = ReqwestHttpClient::new();
@@ -93,7 +96,10 @@ pub fn create_app() {
                 window_min_size: Some(size(px(MIN_WINDOW_WIDTH), px(MIN_WINDOW_HEIGHT))),
                 ..Default::default()
             },
-            |_window, cx| cx.new(|_| App::new(map_center)),
+            |window, cx| {
+                let app_view = cx.new(|_| App::new(map_center));
+                cx.new(|cx| Root::new(app_view, window, cx))
+            },
         )
         .unwrap();
     });
