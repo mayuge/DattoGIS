@@ -1,4 +1,5 @@
 use gpui::*;
+use gpui_platform::application;
 use std::sync::Arc;
 
 use crate::apps::templates::main_window::MainTemplate;
@@ -32,6 +33,7 @@ impl App {
                     url: DEFAULT_RASTER_TILE_URL.into(),
                     opacity: 0.5,
                     visible: true,
+                    attribution: Some("地理院タイル".into()),
                 },
                 RasterTileLayer {
                     id: "gsi-photo".to_string(),
@@ -40,6 +42,7 @@ impl App {
                         .into(),
                     opacity: 0.6,
                     visible: true,
+                    attribution: Some("地理院タイル".into()),
                 },
             ],
         }
@@ -72,7 +75,7 @@ pub fn create_app() {
         })
         .expect("failed to convert initial map center to Web Mercator");
 
-    Application::new().run(move |cx| {
+    application().run(move |cx| {
         #[cfg(not(target_family = "wasm"))]
         {
             let http_client = ReqwestHttpClient::new();

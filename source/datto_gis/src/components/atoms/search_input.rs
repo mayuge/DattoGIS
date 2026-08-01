@@ -17,7 +17,7 @@ impl SearchInput {
         }
     }
 
-    pub fn render(&self) -> impl IntoElement {
+    pub fn build(&self) -> impl IntoElement {
         div().h(px(HEADER_HEIGHT)).flex().items_center().child(
             div()
                 .w(px(400.0))
@@ -37,5 +37,11 @@ impl SearchInput {
                     self.text.clone()
                 }),
         )
+    }
+}
+
+impl Render for SearchInput {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        self.build()
     }
 }

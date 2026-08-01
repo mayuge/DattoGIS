@@ -1,6 +1,6 @@
 use anyhow::Result;
 use futures::future::BoxFuture;
-use gpui_http_client::{AsyncBody, HttpClient, Response};
+use gpui::http_client::{AsyncBody, HttpClient, Response};
 use crate::domain::params::app_config::{APP_NAME};
 
 pub struct ReqwestHttpClient {
@@ -22,15 +22,11 @@ impl ReqwestHttpClient {
 }
 
 impl HttpClient for ReqwestHttpClient {
-    fn type_name(&self) -> &'static str {
-        "ReqwestHttpClient"
-    }
-
     fn user_agent(&self) -> Option<&http::HeaderValue> {
         Some(&self.user_agent)
     }
 
-    fn send(&self, req: gpui_http_client::Request<AsyncBody>) -> BoxFuture<'static, Result<Response<AsyncBody>>> {
+    fn send(&self, req: gpui::http_client::Request<AsyncBody>) -> BoxFuture<'static, Result<Response<AsyncBody>>> {
         let client = self.client.clone();
         let method = req.method().clone();
         let uri = req.uri().clone();

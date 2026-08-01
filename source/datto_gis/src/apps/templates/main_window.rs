@@ -1,5 +1,4 @@
 use crate::domain::params::app_config::*;
-use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::services::map::use_map_area::MapArea;
@@ -48,7 +47,7 @@ impl MainTemplate {
                 div()
                     .flex()
                     .justify_center()
-                    .child(SearchInput::new().render()),
+                    .child(cx.new(|cx| SearchInput::new())),
             )
             .child(Footer::new(map_instance).render())
             //クロスヘアを配置
