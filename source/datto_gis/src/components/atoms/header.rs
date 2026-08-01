@@ -41,7 +41,7 @@ impl Header {
                         )
                         .child(
                             div()
-                                .text_xs()
+                                .text_sm()
                                 .font_weight(FontWeight::BOLD)
                                 .child(self.title.clone()),
                         ),

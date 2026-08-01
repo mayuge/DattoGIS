@@ -1,11 +1,12 @@
 use crate::domain::params::app_config::*;
+use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
+use crate::domain::types::map_coordinate_type::WebMercatorCoordinate;
 use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
 
-use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
 use crate::apps::organisms::main_window::map::map_app::MapApp;
@@ -16,19 +17,51 @@ use crate::components::atoms::search_input::SearchInput;
 
 use std::path::PathBuf;
 
-pub struct MainTemplate;
+pub struct MainTemplate {
+    search_input: Entity<SearchInput>,
+    pub map: MapInstance,
+    pub raster_tile_layers: Vec<RasterTileLayer>,
+}
 
 impl MainTemplate {
-    pub fn render(
+    pub fn new(
+        map_center: WebMercatorCoordinate,
         window: &mut Window,
-        cx: &mut Context<AppState>,
-        map_instance: MapInstance,
-        raster_tile_layers: Vec<RasterTileLayer>,
-    ) -> impl IntoElement {
+        cx: &mut Context<Self>,
+    ) -> Self {
+        Self {
+            search_input: cx.new(|cx| SearchInput::new(window, cx)),
+            map: MapInstance::new(map_center),
+            raster_tile_layers: vec![
+                RasterTileLayer {
+                    id: "gsi".to_string(),
+                    name: "地理院地図".into(),
+                    url: DEFAULT_RASTER_TILE_URL.into(),
+                    opacity: 0.5,
+                    visible: true,
+                    attribution: Some("地理院タイル".into()),
+                },
+                RasterTileLayer {
+                    id: "gsi-photo".to_string(),
+                    name: "航空写真".into(),
+                    url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
+                        .into(),
+                    opacity: 0.6,
+                    visible: true,
+                    attribution: Some("地理院タイル".into()),
+                },
+            ],
+        }
+    }
+}
+
+impl Render for MainTemplate {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> AnyElement {
         let viewport = window.viewport_size();
+
         let map_viewport =
             MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
-        // クロスヘア表示位置を取得
+
         let (crosshair_x, crosshair_y) = map_viewport.get_map_area_center();
 
         div()
@@ -37,8 +70,8 @@ impl MainTemplate {
             .child(div().absolute().inset_0().child(MapApp::render(
                 window,
                 cx,
-                map_instance.clone(),
-                raster_tile_layers,
+                self.map.clone(),
+                self.raster_tile_layers.clone(),
             )))
             .child(LayerControllerApp::render(window, cx))
             .child(ActivityBarApp::render())
@@ -47,10 +80,9 @@ impl MainTemplate {
                 div()
                     .flex()
                     .justify_center()
-                    .child(cx.new(|cx| SearchInput::new(window, cx))),
+                    .child(self.search_input.clone()),
             )
-            .child(Footer::new(map_instance).render())
-            //クロスヘアを配置
+            .child(Footer::new(self.map.clone()).render())
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))
                     .absolute()
@@ -61,5 +93,6 @@ impl MainTemplate {
                     .ml(px(-16.0))
                     .mt(px(-16.0)),
             )
+            .into_any()
     }
 }

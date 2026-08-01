@@ -9,59 +9,36 @@ use crate::domain::params::design_token_config::{
     MIN_WINDOW_WIDTH,
 };
 use crate::domain::params::map_config::{
-    DATA_PROJ_EPSG, DEFAULT_RASTER_TILE_URL, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
+    DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
 };
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
-use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
-use crate::services::map::use_map_instance::MapInstance;
 
 pub struct App {
-    pub map: MapInstance,
-    pub raster_tile_layers: Vec<RasterTileLayer>,
+    pub main_template: Entity<MainTemplate>,
 }
 
 impl App {
-    fn new(map_center: WebMercatorCoordinate) -> Self {
+    fn new(map_center: WebMercatorCoordinate, window: &mut Window, cx: &mut Context<Self>) -> Self {
         Self {
-            map: MapInstance::new(map_center),
-            raster_tile_layers: vec![
-                RasterTileLayer {
-                    id: "gsi".to_string(),
-                    name: "地理院地図".into(),
-                    url: DEFAULT_RASTER_TILE_URL.into(),
-                    opacity: 0.5,
-                    visible: true,
-                    attribution: Some("地理院タイル".into()),
-                },
-                RasterTileLayer {
-                    id: "gsi-photo".to_string(),
-                    name: "航空写真".into(),
-                    url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
-                        .into(),
-                    opacity: 0.6,
-                    visible: true,
-                    attribution: Some("地理院タイル".into()),
-                },
-            ],
+            main_template: cx.new(|cx| MainTemplate::new(map_center, window, cx)),
         }
     }
 }
 
 impl Render for App {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let main_template = self.main_template.clone();
+
         div()
             .size_full()
             .bg(rgb(COLOR_BASE))
             .text_color(rgb(COLOR_TEXT))
-            .child(MainTemplate::render(
-                window,
-                cx,
-                self.map.clone(),
-                self.raster_tile_layers.clone(),
-            ))
+            .child(main_template.update(cx, |template, template_cx| {
+                template.render(window, template_cx).into_any()
+            }))
     }
 }
 
@@ -97,7 +74,7 @@ pub fn create_app() {
                 ..Default::default()
             },
             |window, cx| {
-                let app_view = cx.new(|_| App::new(map_center));
+                let app_view = cx.new(|cx| App::new(map_center, window, cx));
                 cx.new(|cx| Root::new(app_view, window, cx))
             },
         )

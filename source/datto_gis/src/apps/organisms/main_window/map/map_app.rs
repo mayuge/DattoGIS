@@ -1,7 +1,7 @@
 use gpui::*;
 
-use crate::apps::app::App as AppState;
 use crate::apps::organisms::main_window::map::raster_tile_layer_app::RasterTileLayerApp;
+use crate::apps::templates::main_window::MainTemplate;
 use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::params::map_config::{MAP_SCROLL_LINE_DELTA_PIXELS, RASTER_TILE_SIZE};
 use crate::domain::traits::map_area_trait::MapAreaTrait;
@@ -24,7 +24,7 @@ pub struct MapApp;
 impl MapApp {
     pub fn render(
         window: &mut Window,
-        cx: &mut Context<AppState>,
+        cx: &mut Context<MainTemplate>,
         map_instance: MapInstance,
         raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
