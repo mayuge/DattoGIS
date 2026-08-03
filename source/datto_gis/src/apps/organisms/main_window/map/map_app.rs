@@ -3,7 +3,7 @@ use gpui::*;
 use crate::apps::organisms::main_window::map::raster_tile_layer_app::RasterTileLayerApp;
 use crate::apps::templates::main_window::MainTemplate;
 use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
-use crate::domain::params::map_config::{MAP_SCROLL_LINE_DELTA_PIXELS, RASTER_TILE_SIZE};
+use crate::domain::params::map_config::MAP_SCROLL_LINE_DELTA_PIXELS;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;

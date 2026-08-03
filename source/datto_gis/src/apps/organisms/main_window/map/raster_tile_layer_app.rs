@@ -9,7 +9,9 @@ pub struct RasterTileLayerApp;
 
 impl RasterTileLayerApp {
     pub fn render(
+        //各タイルの{z}{x}{y}の数値のリストを保持
         visible_tiles: Vec<MapTile>,
+        //レイヤーのリスト
         raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
         div().children(
