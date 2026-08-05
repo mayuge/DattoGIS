@@ -1,8 +1,10 @@
 use crate::domain::params::app_config::*;
 use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
+use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
-use crate::domain::types::map_coordinate_type::WebMercatorCoordinate;
+use crate::domain::types::map_coordinate_type::EpsgCoordinate;
 use crate::domain::types::map_layer_type::RasterTileLayer;
+use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
@@ -16,19 +18,28 @@ use crate::components::atoms::header::Header;
 use crate::components::atoms::search_input::SearchInput;
 
 use std::path::PathBuf;
-
+//main_templateは、地図の初期状態とアプリ全体のUI構造を定義する
 pub struct MainTemplate {
     search_input: Entity<SearchInput>,
     pub map: MapInstance,
     pub raster_tile_layers: Vec<RasterTileLayer>,
 }
 
+use crate::domain::params::map_config::{
+    DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
+};
+
 impl MainTemplate {
-    pub fn new(
-        map_center: WebMercatorCoordinate,
-        window: &mut Window,
-        cx: &mut Context<Self>,
-    ) -> Self {
+    pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let transformer = ProjCoreCoordinateTransformer;
+        let map_center = transformer
+            .epsg_coordinate_to_web_mercator(EpsgCoordinate {
+                x: MAP_CENTER_LONGITUDE,
+                y: MAP_CENTER_LATITUDE,
+                epsg: DATA_PROJ_EPSG,
+            })
+            .expect("failed to convert initial map center to Web Mercator");
+
         Self {
             search_input: cx.new(|cx| SearchInput::new(window, cx)),
             map: MapInstance::new(map_center),
