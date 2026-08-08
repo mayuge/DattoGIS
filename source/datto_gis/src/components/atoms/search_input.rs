@@ -1,5 +1,5 @@
 use crate::domain::params::design_token_config::{
-    BORDER_RADIUS_MD, COLOR_GRAY_20, COLOR_GRAY_50, HEADER_ICON_HEIGHT, SPACE_MD,
+    BORDER_RADIUS_MD, COLOR_GRAY_20, COLOR_GRAY_50, HEADER_ICON_HEIGHT, SPACE_MD, SPACE_SM,
 };
 use crate::domain::params::text_config::SEARCH_PLACEHOLDER;
 use gpui::*;
@@ -22,14 +22,11 @@ impl Render for SearchInput {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .relative()
-            .top(px(SPACE_MD))
-            .left(px(SPACE_MD))
+            .top(px(SPACE_SM))
             .w(px(400.0))
-            .h(px(28.0))
             .child(
                 Input::new(&self.state)
                     .w(px(400.0))
-                    .h(px(28.0))
                     .border_1()
                     .border_color(rgb(COLOR_GRAY_50))
                     .rounded(px(BORDER_RADIUS_MD))

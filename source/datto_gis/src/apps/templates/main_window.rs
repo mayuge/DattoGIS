@@ -1,10 +1,12 @@
 use crate::domain::params::app_config::*;
 use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
+use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::types::map_coordinate_type::EpsgCoordinate;
 use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
+use crate::infrastructure::json::load_raster_tile_config::LoadRasterTileConfig;
 use crate::services::map::use_map_area::MapArea;
 use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
@@ -16,8 +18,8 @@ use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::components::atoms::footer::Footer;
 use crate::components::atoms::header::Header;
 use crate::components::atoms::search_input::SearchInput;
-
 use std::path::PathBuf;
+
 //main_templateは、地図の初期状態とアプリ全体のUI構造を定義する
 pub struct MainTemplate {
     search_input: Entity<SearchInput>,
@@ -43,25 +45,7 @@ impl MainTemplate {
         Self {
             search_input: cx.new(|cx| SearchInput::new(window, cx)),
             map: MapInstance::new(map_center),
-            raster_tile_layers: vec![
-                RasterTileLayer {
-                    id: "gsi".to_string(),
-                    name: "地理院地図".into(),
-                    url: DEFAULT_RASTER_TILE_URL.into(),
-                    opacity: 0.5,
-                    visible: true,
-                    attribution: Some("地理院タイル".into()),
-                },
-                RasterTileLayer {
-                    id: "gsi-photo".to_string(),
-                    name: "航空写真".into(),
-                    url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
-                        .into(),
-                    opacity: 0.6,
-                    visible: true,
-                    attribution: Some("地理院タイル".into()),
-                },
-            ],
+            raster_tile_layers: LoadRasterTileConfig::load(),
         }
     }
 }

@@ -34,9 +34,9 @@ pub const SPACE_LG: f32 = 16.0;
 pub const SPACE_XL: f32 = 32.0;
 
 /// ヘッダー高さ定義
-pub const HEADER_HEIGHT: f32 = 48.0;
-pub const HEADER_ICON_HEIGHT: f32 = 32.0;
-pub const HEADER_ICON_SIZE: f32 = 28.0;
+pub const HEADER_HEIGHT: f32 = 40.0;
+pub const HEADER_ICON_HEIGHT: f32 = 28.0;
+pub const HEADER_ICON_SIZE: f32 = 24.0;
 
 ///フッター高さ定義
 pub const FOOTER_HEIGHT: f32 = 24.0;

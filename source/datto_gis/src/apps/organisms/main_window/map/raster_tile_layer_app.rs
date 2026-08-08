@@ -14,24 +14,25 @@ impl RasterTileLayerApp {
         //レイヤーのリスト
         raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
-        div().children(
-            raster_tile_layers
-                .into_iter()
-                .filter(|layer| layer.visible)
-                .flat_map(|layer| {
-                    let opacity = layer.opacity;
-                    let url = layer.url.clone();
+        let mut layers: Vec<_> = raster_tile_layers
+            .into_iter()
+            .filter(|layer| layer.visible)
+            .collect();
+        layers.sort_by_key(|layer| layer.z_index);
 
-                    visible_tiles.iter().map(move |tile| {
-                        img(SharedString::from(tile.generate_tile_url(&url)))
-                            .absolute()
-                            .left(px(tile.draw_x))
-                            .top(px(tile.draw_y))
-                            .w(px(RASTER_TILE_SIZE as f32))
-                            .h(px(RASTER_TILE_SIZE as f32))
-                            .opacity(opacity)
-                    })
-                }),
-        )
+        div().children(layers.into_iter().flat_map(|layer| {
+            let opacity = layer.opacity;
+            let url = layer.url.clone();
+
+            visible_tiles.iter().map(move |tile| {
+                img(SharedString::from(tile.generate_tile_url(&url)))
+                    .absolute()
+                    .left(px(tile.draw_x))
+                    .top(px(tile.draw_y))
+                    .w(px(RASTER_TILE_SIZE as f32))
+                    .h(px(RASTER_TILE_SIZE as f32))
+                    .opacity(opacity)
+            })
+        }))
     }
 }
