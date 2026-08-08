@@ -1,4 +1,4 @@
-use crate::apps::templates::main_window::MainTemplate;
+use crate::apps::templates::main_window::MainWindow;
 use crate::domain::params::design_token_config::{
     BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, LAYER_CONTROLLER_WIDTH,
 };
@@ -6,7 +6,7 @@ use gpui::*;
 pub struct LayerControllerApp;
 
 impl LayerControllerApp {
-    pub fn render(_window: &mut Window, _cx: &mut Context<MainTemplate>) -> impl IntoElement {
+    pub fn render(_window: &mut Window, _cx: &mut Context<MainWindow>) -> impl IntoElement {
         div()
             .absolute()
             .top_0()

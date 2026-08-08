@@ -3,6 +3,8 @@ use futures::future::BoxFuture;
 use gpui::http_client::{AsyncBody, HttpClient, Response};
 use crate::domain::params::app_config::{APP_NAME};
 
+// ReqwestHttpClientは、reqwestを使用してHTTPリクエストを送信するための構造体
+//インターネット画像をurl指定でのダウンロードに使う
 pub struct ReqwestHttpClient {
     client: reqwest::blocking::Client,
     user_agent: http::HeaderValue,

@@ -20,8 +20,8 @@ use crate::components::atoms::header::Header;
 use crate::components::atoms::search_input::SearchInput;
 use std::path::PathBuf;
 
-//main_templateは、地図の初期状態とアプリ全体のUI構造を定義する
-pub struct MainTemplate {
+//MainWindowは、地図の初期状態とアプリ全体のUI構造を定義する
+pub struct MainWindow {
     search_input: Entity<SearchInput>,
     pub map: MapInstance,
     pub raster_tile_layers: Vec<RasterTileLayer>,
@@ -31,7 +31,7 @@ use crate::domain::params::map_config::{
     DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
 };
 
-impl MainTemplate {
+impl MainWindow {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let transformer = ProjCoreCoordinateTransformer;
         let map_center = transformer
@@ -50,7 +50,7 @@ impl MainTemplate {
     }
 }
 
-impl Render for MainTemplate {
+impl Render for MainWindow {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> AnyElement {
         let viewport = window.viewport_size();
 
