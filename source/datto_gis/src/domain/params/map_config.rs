@@ -56,9 +56,5 @@ pub const RASTER_TILE_SIZE: f64 = 256.0;
 /// 画面外まで余分に読み込むタイル枚数
 pub const RASTER_TILE_OVERSCAN: i32 = 1;
 
-/// デフォルトラスタータイルURL
-pub const DEFAULT_RASTER_TILE_URL: &str =
-    "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png";
-
 /// デフォルトベクターファイル形式
 pub const DEFAULT_FILE_FORMAT: &str = "geojson";

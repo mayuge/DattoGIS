@@ -1,7 +1,6 @@
 use crate::domain::params::map_config::RASTER_TILE_SIZE;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
-use crate::services::map::use_map_instance::MapInstance;
 use crate::services::map::use_map_tile::MapTile;
 use gpui::*;
 

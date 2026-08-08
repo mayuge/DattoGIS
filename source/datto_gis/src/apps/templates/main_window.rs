@@ -1,5 +1,4 @@
 use crate::domain::params::app_config::*;
-use crate::domain::params::map_config::DEFAULT_RASTER_TILE_URL;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;

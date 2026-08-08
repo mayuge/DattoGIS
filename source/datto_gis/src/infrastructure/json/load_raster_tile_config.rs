@@ -1,6 +1,5 @@
 use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
-use std::{fs, path::PathBuf};
 
 pub struct LoadRasterTileConfig;
 
