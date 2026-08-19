@@ -7,8 +7,7 @@ impl LoadRasterTileConfigTrait for LoadRasterTileConfig {
     // JSONファイルからラスタタイルの設定を読み込み
     fn load() -> Vec<RasterTileLayer> {
         // JSONファイルのパスを指定
-        let config_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("assets/config/raster_tile_config.json");
+        let config_path = std::path::PathBuf::from("assets/config/raster_tile_config.json");
         // JSONファイルを読み込む
         let content = match std::fs::read_to_string(&config_path) {
             Ok(content) => content,
