@@ -55,6 +55,3 @@ pub const RASTER_TILE_SIZE: f64 = 256.0;
 
 /// 画面外まで余分に読み込むタイル枚数
 pub const RASTER_TILE_OVERSCAN: i32 = 1;
-
-/// デフォルトベクターファイル形式
-pub const DEFAULT_FILE_FORMAT: &str = "geojson";

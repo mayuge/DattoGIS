@@ -11,10 +11,11 @@ use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
 
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
+use crate::apps::organisms::main_window::footer_app::FooterApp;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
 use crate::apps::organisms::main_window::map::map_app::MapApp;
+use crate::apps::organisms::main_window::search_app::SearchApp;
 
-use crate::components::atoms::footer::Footer;
 use crate::components::atoms::header::Header;
 use crate::components::atoms::search_input::SearchInput;
 use std::path::PathBuf;
@@ -70,13 +71,8 @@ impl Render for MainWindow {
             .child(LayerControllerApp::render(window, cx))
             .child(ActivityBarApp::render())
             .child(Header::new(APP_NAME.to_string()).render())
-            .child(
-                div()
-                    .flex()
-                    .justify_center()
-                    .child(self.search_input.clone()),
-            )
-            .child(Footer::new(self.map.clone()).render())
+            .child(SearchApp::render(self.search_input.clone()))
+            .child(FooterApp::render(self.map.clone()))
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))
                     .absolute()
