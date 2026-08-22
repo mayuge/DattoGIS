@@ -1,4 +1,4 @@
-use crate::components::atoms::search_input::SearchInput;
+use crate::apps::organisms::common::components::atoms::search_input::SearchInput;
 use gpui::*;
 
 pub struct SearchApp;

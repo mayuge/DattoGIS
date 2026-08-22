@@ -1,5 +1,5 @@
-use crate::apps::organisms::services::map::use_map_area::MapArea;
-use crate::apps::organisms::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::common::services::map::use_map_area::MapArea;
+use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
 use crate::domain::params::app_config::*;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
@@ -16,8 +16,8 @@ use crate::apps::organisms::main_window::layer_controller_app::LayerControllerAp
 use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::apps::organisms::main_window::search_app::SearchApp;
 
-use crate::components::atoms::header::Header;
-use crate::components::atoms::search_input::SearchInput;
+use crate::apps::organisms::common::components::atoms::header::Header;
+use crate::apps::organisms::common::components::atoms::search_input::SearchInput;
 use std::path::PathBuf;
 
 //MainWindowは、地図の初期状態とアプリ全体のUI構造を定義する

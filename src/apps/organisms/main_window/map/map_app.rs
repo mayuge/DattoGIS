@@ -1,5 +1,9 @@
 use gpui::*;
 
+use crate::apps::organisms::common::services::map::use_map_area::MapArea;
+use crate::apps::organisms::common::services::map::use_map_event::MapEvent;
+use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::apps::organisms::main_window::map::raster_tile_layer_app::RasterTileLayerApp;
 use crate::apps::templates::main_window::MainWindow;
 use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
@@ -8,10 +12,6 @@ use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
-use crate::apps::organisms::services::map::use_map_area::MapArea;
-use crate::apps::organisms::services::map::use_map_event::MapEvent;
-use crate::apps::organisms::services::map::use_map_instance::MapInstance;
-use crate::apps::organisms::services::map::use_map_tile::MapTile;
 
 #[derive(Default)]
 struct DragState {

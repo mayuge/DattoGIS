@@ -1,7 +1,7 @@
+use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::domain::params::map_config::RASTER_TILE_SIZE;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
-use crate::apps::organisms::services::map::use_map_tile::MapTile;
 use gpui::*;
 
 pub struct RasterTileLayerApp;

@@ -1,5 +1,5 @@
 use crate::apps::templates::main_window::MainWindow;
-use crate::components::molecules::layer_item::LayerItem;
+use crate::apps::organisms::common::components::molecules::layer_item::LayerItem;
 use crate::domain::params::design_token_config::{
     ACTIVITY_BAR_WIDTH, BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, HEADER_HEIGHT,
     LAYER_CONTROLLER_WIDTH, SPACE_MD,

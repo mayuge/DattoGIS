@@ -1,4 +1,4 @@
-use crate::apps::organisms::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
 
 pub trait MapTileTrait: Sized {
     fn generate_tile_url(&self, tile_url: &str) -> String;
