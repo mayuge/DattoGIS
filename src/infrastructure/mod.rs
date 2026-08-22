@@ -1,3 +1,3 @@
 pub mod coordinate;
-pub mod http;
+pub mod client;
 pub mod json;

@@ -9,7 +9,7 @@ use crate::domain::params::design_token_config::{
     MIN_WINDOW_WIDTH,
 };
 
-use crate::infrastructure::http::http_request_client::ReqwestHttpClient;
+use crate::infrastructure::client::index::ReqwestHttpClient;
 
 //appでは、アプリのルートコンポーネントを定義する
 pub struct App {

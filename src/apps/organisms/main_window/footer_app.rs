@@ -1,8 +1,8 @@
+use crate::apps::organisms::services::map::use_map_instance::MapInstance;
 use crate::components::atoms::footer::Footer;
 use crate::domain::params::map_config::DATA_PROJ_EPSG;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
-use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
 
 pub struct FooterApp;

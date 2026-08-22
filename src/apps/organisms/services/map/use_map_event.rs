@@ -2,7 +2,7 @@ use crate::domain::params::map_config::{
     MAP_MAX_ZOOM_LEVEL, MAP_MIN_ZOOM_LEVEL, RASTER_TILE_SIZE, WEB_MERCATOR_HALF_WORLD_WIDTH,
 };
 use crate::domain::traits::map_event_trait::MapEventTrait;
-use crate::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::services::map::use_map_instance::MapInstance;
 
 pub struct MapEvent;
 

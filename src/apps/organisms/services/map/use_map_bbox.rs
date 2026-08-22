@@ -1,7 +1,7 @@
 use crate::domain::types::map_bbox_type::Bbox;
 use crate::domain::types::map_coordinate_type::WebMercatorCoordinate;
-use crate::services::map::use_map_instance::MapInstance;
-use crate::services::map::use_map_world_pixel::WorldPixel;
+use crate::apps::organisms::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::services::map::use_map_world_pixel::WorldPixel;
 
 use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
 

@@ -1,4 +1,4 @@
-use crate::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::services::map::use_map_instance::MapInstance;
 
 pub trait MapEventTrait {
     fn zoom_by_scroll(map: &mut MapInstance, scroll_delta_y: f32);

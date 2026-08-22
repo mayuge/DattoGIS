@@ -6,7 +6,6 @@ mod components;
 //#[allow(dead_code)]
 mod domain;
 mod infrastructure;
-mod services;
 
 use apps::app::create_app;
 

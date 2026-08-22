@@ -1,3 +1,5 @@
+use crate::apps::organisms::services::map::use_map_area::MapArea;
+use crate::apps::organisms::services::map::use_map_instance::MapInstance;
 use crate::domain::params::app_config::*;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
@@ -6,8 +8,6 @@ use crate::domain::types::map_coordinate_type::EpsgCoordinate;
 use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::infrastructure::json::load_raster_tile_config::LoadRasterTileConfig;
-use crate::services::map::use_map_area::MapArea;
-use crate::services::map::use_map_instance::MapInstance;
 use gpui::*;
 
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;

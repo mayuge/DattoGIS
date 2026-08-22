@@ -8,10 +8,10 @@ use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
-use crate::services::map::use_map_area::MapArea;
-use crate::services::map::use_map_event::MapEvent;
-use crate::services::map::use_map_instance::MapInstance;
-use crate::services::map::use_map_tile::MapTile;
+use crate::apps::organisms::services::map::use_map_area::MapArea;
+use crate::apps::organisms::services::map::use_map_event::MapEvent;
+use crate::apps::organisms::services::map::use_map_instance::MapInstance;
+use crate::apps::organisms::services::map::use_map_tile::MapTile;
 
 #[derive(Default)]
 struct DragState {
