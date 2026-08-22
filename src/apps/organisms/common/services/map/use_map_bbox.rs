@@ -8,6 +8,7 @@ use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
 pub struct MapBbox;
 
 impl MapBbox {
+    /// 地図中心と表示サイズから表示範囲の境界ボックスを計算する。
     pub fn calculate(map: &MapInstance, width: f32, height: f32) -> Bbox {
         let zoom_level = map.zoom_level.round() as u32;
 

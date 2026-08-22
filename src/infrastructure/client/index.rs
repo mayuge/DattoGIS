@@ -11,6 +11,7 @@ pub struct ReqwestHttpClient {
 }
 
 impl ReqwestHttpClient {
+    /// アプリケーション用の reqwest HTTP クライアントを生成する。
     pub fn new() -> Self {
         let client = reqwest::blocking::Client::builder()
             .build()
@@ -24,10 +25,12 @@ impl ReqwestHttpClient {
 }
 
 impl HttpClient for ReqwestHttpClient {
+    /// HTTP リクエストで使用する User-Agent を返す。
     fn user_agent(&self) -> Option<&http::HeaderValue> {
         Some(&self.user_agent)
     }
 
+    /// GPUI の HTTP リクエストを reqwest で送信する。
     fn send(&self, req: gpui::http_client::Request<AsyncBody>) -> BoxFuture<'static, Result<Response<AsyncBody>>> {
         let client = self.client.clone();
         let method = req.method().clone();
@@ -56,6 +59,7 @@ impl HttpClient for ReqwestHttpClient {
         })
     }
 
+    /// プロキシ未使用であることを返す。
     fn proxy(&self) -> Option<&url::Url> {
         None
     }

@@ -1,13 +1,6 @@
 use crate::apps::organisms::common::services::map::use_map_area::MapArea;
-use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
 use crate::domain::params::app_config::*;
-use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
-use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
-use crate::domain::types::map_coordinate_type::EpsgCoordinate;
-use crate::domain::types::map_layer_type::RasterTileLayer;
-use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
-use crate::infrastructure::json::load_raster_tile_config::LoadRasterTileConfig;
 use gpui::*;
 
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
@@ -17,99 +10,47 @@ use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::apps::organisms::main_window::search_app::SearchApp;
 
 use crate::apps::organisms::common::components::atoms::header::Header;
-use crate::apps::organisms::common::components::atoms::search_input::{
-    SearchInput, SearchSubmitted,
-};
-use crate::infrastructure::client::geocoding::search_address;
 use std::path::PathBuf;
 
 //MainWindowは、地図の初期状態とアプリ全体のUI構造を定義する
 pub struct MainWindow {
-    search_input: Entity<SearchInput>,
-    pub map: MapInstance,
-    pub raster_tile_layers: Vec<RasterTileLayer>,
-    _search_subscription: Subscription,
-    _search_task: Option<Task<()>>,
+    map_app: Entity<MapApp>,
+    search_app: Entity<SearchApp>,
+    footer_app: Entity<FooterApp>,
 }
 
-use crate::domain::params::map_config::{
-    DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE,
-};
-
 impl MainWindow {
+    /// 各 organism を生成して画面を構成する。
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let transformer = ProjCoreCoordinateTransformer;
-        let map_center = transformer
-            .epsg_coordinate_to_web_mercator(EpsgCoordinate {
-                x: MAP_CENTER_LONGITUDE,
-                y: MAP_CENTER_LATITUDE,
-                epsg: DATA_PROJ_EPSG,
-            })
-            .expect("failed to convert initial map center to Web Mercator");
-
-        let search_input = cx.new(|cx| SearchInput::new(window, cx));
-        let _search_subscription = cx.subscribe(&search_input, |main_window, _, event, cx| {
-            let SearchSubmitted(address) = event;
-            main_window.search(address.clone(), cx);
-        });
+        let map_app = cx.new(MapApp::new);
+        let search_app = cx.new(|cx| SearchApp::new(window, map_app.clone(), cx));
+        let footer_app = cx.new(|cx| FooterApp::new(map_app.clone(), cx));
 
         Self {
-            search_input,
-            map: MapInstance::new(map_center),
-            raster_tile_layers: LoadRasterTileConfig::load(),
-            _search_subscription,
-            _search_task: None,
+            map_app,
+            search_app,
+            footer_app,
         }
-    }
-
-    fn search(&mut self, address: String, cx: &mut Context<Self>) {
-        self._search_task = Some(cx.spawn(async move |this, cx| {
-            let result = cx.background_spawn(async move { search_address(&address) }).await;
-
-            let Some(coordinate) = result.ok().flatten() else {
-                return;
-            };
-
-            let transformer = ProjCoreCoordinateTransformer;
-            let Ok(center) = transformer.epsg_coordinate_to_web_mercator(EpsgCoordinate {
-                x: coordinate.longitude,
-                y: coordinate.latitude,
-                epsg: DATA_PROJ_EPSG,
-            }) else {
-                return;
-            };
-
-            let _ = this.update(cx, |main_window, cx| {
-                main_window.map.center = center;
-                cx.notify();
-            });
-        }));
     }
 }
 
 impl Render for MainWindow {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> AnyElement {
+    /// ウィンドウ内の各 organism と照準を配置する。
+    fn render(&mut self, window: &mut Window, _cx: &mut Context<Self>) -> AnyElement {
         let viewport = window.viewport_size();
-
-        let map_viewport =
+        let map_area =
             MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
-
-        let (crosshair_x, crosshair_y) = map_viewport.get_map_area_center();
+        let (crosshair_x, crosshair_y) = map_area.get_map_area_center();
 
         div()
             .relative()
             .size_full()
-            .child(div().absolute().inset_0().child(MapApp::render(
-                window,
-                cx,
-                self.map.clone(),
-                self.raster_tile_layers.clone(),
-            )))
-            .child(LayerControllerApp::render(window, cx))
+            .child(self.map_app.clone())
+            .child(LayerControllerApp::render(window))
             .child(ActivityBarApp::render())
             .child(Header::new(APP_NAME.to_string()).render())
-            .child(SearchApp::render(self.search_input.clone()))
-            .child(FooterApp::render(self.map.clone()))
+            .child(self.search_app.clone())
+            .child(self.footer_app.clone())
             .child(
                 img(PathBuf::from("assets/map/crosshair.svg"))
                     .absolute()

@@ -9,6 +9,7 @@ pub struct Footer {
 }
 
 impl Footer {
+    /// 左右に表示するテキストを持つフッターを生成する。
     pub fn new(left_text: String, right_text: String) -> Self {
         Self {
             left_text,
@@ -16,6 +17,7 @@ impl Footer {
         }
     }
 
+    /// フッターのコンテナとステータステキストを描画する。
     pub fn render(self) -> impl IntoElement {
         div()
             .absolute()

@@ -9,6 +9,7 @@ pub struct ProjCoreCoordinateTransformer;
 
 impl CoordinateTransformer for ProjCoreCoordinateTransformer {
     //座標系指定つき座標からウェブメルカトルへ変換
+    /// 指定 EPSG の座標を Web Mercator 座標へ変換する。
     fn epsg_coordinate_to_web_mercator(
         &self,
         coordinate: EpsgCoordinate,
@@ -22,6 +23,7 @@ impl CoordinateTransformer for ProjCoreCoordinateTransformer {
         Ok(WebMercatorCoordinate { x, y })
     }
     //ウェブメルカトルから座標系指定つき座標へ変換
+    /// Web Mercator 座標を指定 EPSG の座標へ変換する。
     fn web_mercator_to_epsg_coordinate(
         &self,
         coordinate: WebMercatorCoordinate,

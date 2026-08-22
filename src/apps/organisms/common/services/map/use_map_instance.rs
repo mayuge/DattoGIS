@@ -8,6 +8,7 @@ pub struct MapInstance {
 }
 
 impl MapInstance {
+    /// 指定した中心座標で地図状態を生成する。
     pub fn new(center: WebMercatorCoordinate) -> Self {
         Self {
             center,

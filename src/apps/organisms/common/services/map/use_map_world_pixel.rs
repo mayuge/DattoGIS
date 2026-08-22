@@ -9,6 +9,7 @@ pub struct WorldPixel {
 }
 
 impl WorldPixelTrait for WorldPixel {
+    /// Web Mercator 座標を指定ズームのワールドピクセルへ変換する。
     fn convert_coordinate_to_pixel(coordinate: &WebMercatorCoordinate, zoom_level: u32) -> Self {
         // 256px*2^zoom_level(タイルの大きさ×枚数)
         //タイルの一辺の枚数は2のzoom_level乗,0なら1枚、5なら32枚
@@ -22,6 +23,7 @@ impl WorldPixelTrait for WorldPixel {
         Self { pixel_x, pixel_y }
     }
 
+    /// ワールドピクセルを Web Mercator 座標へ変換する。
     fn convert_pixel_to_coordinate(
         pixel_x: f64,
         pixel_y: f64,
@@ -38,18 +40,22 @@ impl WorldPixelTrait for WorldPixel {
         WebMercatorCoordinate { x, y }
     }
 
+    /// ワールドピクセルが属するタイル列番号を返す。
     fn tile_column(&self) -> u32 {
         (self.pixel_x / RASTER_TILE_SIZE).floor() as u32
     }
 
+    /// ワールドピクセルが属するタイル行番号を返す。
     fn tile_row(&self) -> u32 {
         (self.pixel_y / RASTER_TILE_SIZE).floor() as u32
     }
 
+    /// タイル内の X 方向ピクセルオフセットを返す。
     fn pixel_offset_x(&self) -> f64 {
         self.pixel_x % RASTER_TILE_SIZE
     }
 
+    /// タイル内の Y 方向ピクセルオフセットを返す。
     fn pixel_offset_y(&self) -> f64 {
         self.pixel_y % RASTER_TILE_SIZE
     }

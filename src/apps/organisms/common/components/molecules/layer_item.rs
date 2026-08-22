@@ -12,6 +12,7 @@ pub struct LayerItem {
 }
 
 impl LayerItem {
+    /// レイヤーの表示情報からリスト項目を生成する。
     pub fn new(id: &str, name: &str, visible: bool, opacity: f32) -> Self {
         Self {
             id: id.to_string(),
@@ -21,6 +22,7 @@ impl LayerItem {
         }
     }
 
+    /// レイヤー名を表示するリスト項目を描画する。
     pub fn render(&self) -> impl IntoElement {
         div()
             .w_full()

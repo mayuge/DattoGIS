@@ -7,6 +7,7 @@ use gpui::*;
 pub struct RasterTileLayerApp;
 
 impl RasterTileLayerApp {
+    /// 可視レイヤーのタイル画像を z-index 順に描画する。
     pub fn render(
         //各タイルの{z}{x}{y}の数値のリストを保持
         visible_tiles: Vec<MapTile>,

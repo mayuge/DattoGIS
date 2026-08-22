@@ -16,6 +16,7 @@ pub struct SearchInput {
 impl EventEmitter<SearchSubmitted> for SearchInput {}
 
 impl SearchInput {
+    /// Enter キーで検索イベントを発行する入力欄を初期化する。
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let state = cx.new(|cx| InputState::new(window, cx).placeholder(SEARCH_PLACEHOLDER));
         let _subscription = cx.subscribe(&state, |_, state, event: &InputEvent, cx| {
@@ -35,6 +36,7 @@ impl SearchInput {
 }
 
 impl Render for SearchInput {
+    /// 検索アイコン付きの入力欄を描画する。
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .relative()

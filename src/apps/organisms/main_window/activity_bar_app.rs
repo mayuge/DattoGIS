@@ -9,6 +9,7 @@ use std::path::PathBuf;
 pub struct ActivityBarApp;
 
 impl ActivityBarApp {
+    /// アクティビティバーのアイコン群を描画する。
     pub fn render() -> impl IntoElement {
         div()
             .absolute()

@@ -1,4 +1,3 @@
-use crate::apps::templates::main_window::MainWindow;
 use crate::apps::organisms::common::components::molecules::layer_item::LayerItem;
 use crate::domain::params::design_token_config::{
     ACTIVITY_BAR_WIDTH, BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, HEADER_HEIGHT,
@@ -8,7 +7,8 @@ use gpui::*;
 pub struct LayerControllerApp;
 
 impl LayerControllerApp {
-    pub fn render(_window: &mut Window, _cx: &mut Context<MainWindow>) -> impl IntoElement {
+    /// レイヤー操作パネルを描画する。
+    pub fn render(_window: &mut Window) -> impl IntoElement {
         div()
             .absolute()
             .top_0()

@@ -18,6 +18,7 @@ pub struct App {
 
 impl App {
     //アプリのルートコンポーネントを作成する
+    /// ルート画面を初期化する。
     fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         Self {
             //main_windowは、地図の初期状態とアプリ全体のUI構造を定義する
@@ -27,6 +28,7 @@ impl App {
 }
 
 impl Render for App {
+    /// アプリケーション全体のルート要素を描画する。
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let main_window = self.main_window.clone();
 
@@ -41,6 +43,7 @@ impl Render for App {
 }
 
 /// アプリ起動
+/// GPUI を設定し、メインウィンドウを開く。
 pub fn create_app() {
     application().run(move |cx| {
         init_gpui_component(cx);

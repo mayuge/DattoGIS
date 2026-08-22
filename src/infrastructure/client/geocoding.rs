@@ -23,6 +23,7 @@ struct Geometry {
     coordinates: Vec<f64>,
 }
 
+/// 住所をジオコーディング API で検索し、最初の座標を返す。
 pub fn search_address(address: &str) -> Result<Option<GeocodedCoordinate>> {
     let encoded_address: String = form_urlencoded::byte_serialize(address.as_bytes()).collect();
     let response = reqwest::blocking::get(format!("{GEOCODING_API_URL}{encoded_address}"))?;

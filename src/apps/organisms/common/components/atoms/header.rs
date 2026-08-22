@@ -10,10 +10,12 @@ pub struct Header {
 }
 
 impl Header {
+    /// 表示するタイトルを持つヘッダーを生成する。
     pub fn new(title: String) -> Self {
         Self { title }
     }
 
+    /// タイトルとウィンドウ操作ボタンを描画する。
     pub fn render(&self) -> impl IntoElement {
         div()
             .absolute()

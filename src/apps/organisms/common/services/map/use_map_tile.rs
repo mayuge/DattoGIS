@@ -26,6 +26,7 @@ pub struct MapTile {
 
 impl MapTileTrait for MapTile {
     /// タイルURLを生成する
+    /// URL テンプレートの座標プレースホルダーをタイル値で置換する。
     fn generate_tile_url(&self, tile_url: &str) -> String {
         tile_url
             .replace("{z}", &self.zoom_level.to_string())
@@ -34,6 +35,7 @@ impl MapTileTrait for MapTile {
     }
     /// 表示するラスタータイル一覧を計算する
     /// マップインスタンス（xyz）、画面の幅、高さが渡される
+    /// ビューポートに描画すべきタイルと画面上の座標を算出する。
     fn calculate_visible_tiles(
         map: &MapInstance,
         viewport_width: f32,
