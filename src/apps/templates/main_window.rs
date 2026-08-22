@@ -17,7 +17,10 @@ use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::apps::organisms::main_window::search_app::SearchApp;
 
 use crate::apps::organisms::common::components::atoms::header::Header;
-use crate::apps::organisms::common::components::atoms::search_input::SearchInput;
+use crate::apps::organisms::common::components::atoms::search_input::{
+    SearchInput, SearchSubmitted,
+};
+use crate::infrastructure::client::geocoding::search_address;
 use std::path::PathBuf;
 
 //MainWindowは、地図の初期状態とアプリ全体のUI構造を定義する
@@ -25,6 +28,8 @@ pub struct MainWindow {
     search_input: Entity<SearchInput>,
     pub map: MapInstance,
     pub raster_tile_layers: Vec<RasterTileLayer>,
+    _search_subscription: Subscription,
+    _search_task: Option<Task<()>>,
 }
 
 use crate::domain::params::map_config::{
@@ -42,11 +47,43 @@ impl MainWindow {
             })
             .expect("failed to convert initial map center to Web Mercator");
 
+        let search_input = cx.new(|cx| SearchInput::new(window, cx));
+        let _search_subscription = cx.subscribe(&search_input, |main_window, _, event, cx| {
+            let SearchSubmitted(address) = event;
+            main_window.search(address.clone(), cx);
+        });
+
         Self {
-            search_input: cx.new(|cx| SearchInput::new(window, cx)),
+            search_input,
             map: MapInstance::new(map_center),
             raster_tile_layers: LoadRasterTileConfig::load(),
+            _search_subscription,
+            _search_task: None,
         }
+    }
+
+    fn search(&mut self, address: String, cx: &mut Context<Self>) {
+        self._search_task = Some(cx.spawn(async move |this, cx| {
+            let result = cx.background_spawn(async move { search_address(&address) }).await;
+
+            let Some(coordinate) = result.ok().flatten() else {
+                return;
+            };
+
+            let transformer = ProjCoreCoordinateTransformer;
+            let Ok(center) = transformer.epsg_coordinate_to_web_mercator(EpsgCoordinate {
+                x: coordinate.longitude,
+                y: coordinate.latitude,
+                epsg: DATA_PROJ_EPSG,
+            }) else {
+                return;
+            };
+
+            let _ = this.update(cx, |main_window, cx| {
+                main_window.map.center = center;
+                cx.notify();
+            });
+        }));
     }
 }
 

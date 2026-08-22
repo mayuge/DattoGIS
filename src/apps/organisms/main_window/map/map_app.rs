@@ -28,9 +28,10 @@ impl MapApp {
         map_instance: MapInstance,
         raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
-        let map_state = window.use_state(cx, |_, _| map_instance);
+        let map_state = window.use_state(cx, |_, _| map_instance.clone());
         let drag_state = window.use_state(cx, |_, _| DragState::default());
 
+        map_state.update(cx, |map, _| *map = map_instance);
         let map = map_state.read(cx).clone();
         let viewport = window.viewport_size();
         let map_viewport =

@@ -3,18 +3,34 @@ use crate::domain::params::design_token_config::{
 };
 use crate::domain::params::text_config::SEARCH_PLACEHOLDER;
 use gpui::*;
-use gpui_component::input::{Input, InputState};
+use gpui_component::input::{Input, InputEvent, InputState};
 use std::path::PathBuf;
+
+pub struct SearchSubmitted(pub String);
 
 pub struct SearchInput {
     state: Entity<InputState>,
+    _subscription: Subscription,
 }
+
+impl EventEmitter<SearchSubmitted> for SearchInput {}
 
 impl SearchInput {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let state = cx.new(|cx| InputState::new(window, cx).placeholder(SEARCH_PLACEHOLDER));
+        let _subscription = cx.subscribe(&state, |_, state, event: &InputEvent, cx| {
+            if matches!(event, InputEvent::PressEnter { .. }) {
+                let address = state.read(cx).value().to_string();
+                if !address.trim().is_empty() {
+                    cx.emit(SearchSubmitted(address));
+                }
+            }
+        });
 
-        Self { state }
+        Self {
+            state,
+            _subscription,
+        }
     }
 }
 
