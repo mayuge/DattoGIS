@@ -13,6 +13,7 @@ pub struct FooterApp {
 impl FooterApp {
     /// 地図状態の更新を購読するフッターを初期化する。
     pub fn new(map_app: Entity<MapApp>, cx: &mut Context<Self>) -> Self {
+        //subscriptionは、MapChangedイベントを購読し、地図状態が変化した際にフッターを更新するために使用される。
         let _map_subscription = cx.subscribe(&map_app, |_, _, _: &MapChanged, cx| cx.notify());
         Self {
             map_app,

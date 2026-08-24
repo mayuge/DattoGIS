@@ -28,7 +28,7 @@ struct DragState {
 pub struct MapChanged;
 
 pub struct MapApp {
-    map: MapInstance,
+    map_instance: MapInstance,
     raster_tile_layers: Vec<RasterTileLayer>,
     drag_state: DragState,
 }
@@ -47,7 +47,7 @@ impl MapApp {
             .expect("failed to convert initial map center to Web Mercator");
 
         Self {
-            map: MapInstance::new(center),
+            map_instance: MapInstance::new(center),
             raster_tile_layers: LoadRasterTileConfig::load(),
             drag_state: DragState::default(),
         }
@@ -55,17 +55,17 @@ impl MapApp {
 
     /// 地図中心を更新し、購読者へ変更を通知する。
     pub fn set_center(&mut self, center: WebMercatorCoordinate, cx: &mut Context<Self>) {
-        self.map.center = center;
-        self.changed(cx);
+        self.map_instance.set_center(center);
+        self.on_change_event(cx);
     }
 
     /// 現在の地図状態を読み取り専用で返す。
     pub fn map(&self) -> &MapInstance {
-        &self.map
+        &self.map_instance
     }
 
     /// 地図の状態変更を通知して再描画を要求する。
-    fn changed(&mut self, cx: &mut Context<Self>) {
+    fn on_change_event(&mut self, cx: &mut Context<Self>) {
         cx.emit(MapChanged);
         cx.notify();
     }
@@ -78,7 +78,7 @@ impl Render for MapApp {
         let map_viewport =
             MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
         let visible_tiles =
-            MapTile::calculate_visible_tiles(&self.map, map_viewport.width, map_viewport.height);
+            MapTile::calculate_visible_tiles(&self.map_instance, map_viewport.width, map_viewport.height);
         let map_app = cx.entity();
         let map_app_for_scroll = map_app.clone();
         let map_app_for_mouse_down = map_app.clone();
@@ -91,39 +91,47 @@ impl Render for MapApp {
             .left(px(LAYER_CONTROLLER_WIDTH))
             .right_0()
             .on_scroll_wheel(move |event, window, cx| {
+                //ホイールイベント
                 let delta = match event.delta {
                     ScrollDelta::Pixels(delta) => f32::from(delta.y),
                     ScrollDelta::Lines(delta) => delta.y * MAP_SCROLL_LINE_DELTA_PIXELS,
                 };
                 map_app_for_scroll.update(cx, |map_app, cx| {
-                    MapEvent::zoom_by_scroll(&mut map_app.map, delta);
-                    map_app.changed(cx);
+                    MapEvent::zoom_by_scroll(&mut map_app.map_instance, delta);
+                    map_app.on_change_event(cx);
                 });
                 window.refresh();
             })
             .on_mouse_down(MouseButton::Left, move |event, window, cx| {
                 map_app_for_mouse_down.update(cx, |map_app, _| {
+                    // ドラッグ開始
                     map_app.drag_state.is_dragging = true;
+                    // ドラッグ開始位置を記録
                     map_app.drag_state.last_position = Some(event.position);
                 });
                 window.refresh();
             })
             .on_mouse_move(move |event, window, cx| {
                 map_app_for_mouse_move.update(cx, |map_app, cx| {
+                    // ドラッグ中の処理
                     if !map_app.drag_state.is_dragging {
                         return;
                     }
+                    // ドラッグ中のマウス位置の変化量を計算
                     let Some(last_position) = map_app.drag_state.last_position else {
                         return;
                     };
+                    // ドラッグ中のマウス位置の変化量を計算
                     let delta = event.position - last_position;
+                    // ドラッグによる地図の移動を実行
                     MapEvent::pan_by_pixels(
-                        &mut map_app.map,
+                        &mut map_app.map_instance,
                         f32::from(delta.x),
                         f32::from(delta.y),
                     );
+                    // ドラッグ中のマウス位置を更新
                     map_app.drag_state.last_position = Some(event.position);
-                    map_app.changed(cx);
+                    map_app.on_change_event(cx);
                 });
                 window.refresh();
             })

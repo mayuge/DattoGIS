@@ -7,12 +7,35 @@ pub struct MapInstance {
     pub zoom_level: f64,
 }
 
+trait MapInstanceTrait {
+    fn new(center: WebMercatorCoordinate) -> Self;
+    fn set_center(&mut self, center: WebMercatorCoordinate);
+}
+
+impl MapInstanceTrait for MapInstance {
+    fn new(center: WebMercatorCoordinate) -> Self {
+        Self {
+            center,
+            zoom_level: MAP_ZOOM_LEVEL,
+        }
+    }
+
+    fn set_center(&mut self, center: WebMercatorCoordinate) {
+        self.center = center;
+    }
+}
+
 impl MapInstance {
-    /// 指定した中心座標で地図状態を生成する。
+    /// 初期位置とズームレベルを持つ地図インスタンスを生成する。
     pub fn new(center: WebMercatorCoordinate) -> Self {
         Self {
             center,
             zoom_level: MAP_ZOOM_LEVEL,
         }
+    }
+
+    /// 地図中心を更新する。
+    pub fn set_center(&mut self, center: WebMercatorCoordinate) {
+        self.center = center;
     }
 }

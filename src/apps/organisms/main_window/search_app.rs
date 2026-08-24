@@ -4,9 +4,10 @@ use crate::apps::organisms::common::components::atoms::search_input::{
 use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::domain::params::map_config::DATA_PROJ_EPSG;
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
+use crate::domain::traits::geocoding_trait::GeocodingTrait;
 use crate::domain::types::map_coordinate_type::EpsgCoordinate;
-use crate::infrastructure::client::geocoding::search_address;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
+use crate::infrastructure::geocoding::index::Geocoding;
 use gpui::*;
 
 pub struct SearchApp {
@@ -37,7 +38,7 @@ impl SearchApp {
         let map_app = self.map_app.clone();
         self._search_task = Some(cx.spawn(async move |_this, cx| {
             let result = cx
-                .background_spawn(async move { search_address(&address) })
+                .background_spawn(async move { Geocoding.search_address(&address) })
                 .await;
             let Some(coordinate) = result.ok().flatten() else {
                 return;
