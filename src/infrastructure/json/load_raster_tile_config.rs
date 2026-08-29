@@ -31,4 +31,17 @@ impl LoadRasterTileConfigTrait for LoadRasterTileConfig {
             });
         raster_tile_layers
     }
+
+    fn save(layers: &[RasterTileLayer]) -> Result<(), String> {
+        let config_path = std::path::PathBuf::from("assets/config/raster_tile_config.json");
+        let content = serde_json::to_string_pretty(layers)
+            .map_err(|err| format!("failed to serialize raster tile config: {err}"))?;
+
+        std::fs::write(&config_path, content).map_err(|err| {
+            format!(
+                "failed to write raster tile config {}: {err}",
+                config_path.display()
+            )
+        })
+    }
 }

@@ -6,6 +6,7 @@ use gpui::*;
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
 use crate::apps::organisms::main_window::footer_app::FooterApp;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
+use crate::apps::organisms::common::components::molecules::layer_item::LayerVisibilityChanged;
 use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::apps::organisms::main_window::search_app::SearchApp;
 
@@ -17,6 +18,8 @@ pub struct MainWindow {
     map_app: Entity<MapApp>,
     search_app: Entity<SearchApp>,
     footer_app: Entity<FooterApp>,
+    layer_controller_app: Entity<LayerControllerApp>,
+    _layer_visibility_subscription: Subscription,
 }
 
 impl MainWindow {
@@ -25,11 +28,23 @@ impl MainWindow {
         let map_app = cx.new(MapApp::new);
         let search_app = cx.new(|cx| SearchApp::new(window, map_app.clone(), cx));
         let footer_app = cx.new(|cx| FooterApp::new(map_app.clone(), cx));
+        let layer_controller_app = cx.new(LayerControllerApp::new);
+        let map_app_for_layer_change = map_app.clone();
+        let _layer_visibility_subscription = cx.subscribe(
+            &layer_controller_app,
+            move |_, _, event: &LayerVisibilityChanged, cx| {
+                let _ = map_app_for_layer_change.update(cx, |map_app, cx| {
+                    map_app.set_layer_visibility(&event.id, event.visible, cx);
+                });
+            },
+        );
 
         Self {
             map_app,
             search_app,
             footer_app,
+            layer_controller_app,
+            _layer_visibility_subscription,
         }
     }
 }
@@ -46,7 +61,7 @@ impl Render for MainWindow {
             .relative()
             .size_full()
             .child(self.map_app.clone())
-            .child(LayerControllerApp::render(window))
+            .child(self.layer_controller_app.clone())
             .child(ActivityBarApp::render())
             .child(Header::new(APP_NAME.to_string()).render())
             .child(self.search_app.clone())

@@ -1,38 +1,38 @@
 [
-{
-    "id":"gsi_std",
-    "name":"地理院タイル（標準地図）",
-    "url":"https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
+  {
+    "id": "gsi_std",
+    "name": "地理院タイル（標準地図）",
+    "url": "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
     "z_index": 4,
-    "visible": true,
     "opacity": 1.0,
-    "attribution": "国土地理院"
-},
-{
-    "id":"gsi_pale",
-    "name":"地理院タイル（淡色地図）",
-    "url":"https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",
-    "z_index": 3,
-    "visible": true,
-    "opacity": 1.0,
-    "attribution": "国土地理院"
-},
-{
-    "id":"gsi_blank",
-    "name":"地理院タイル（白地図）",
-    "url":"https://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png",
-    "z_index": 2,
-    "visible": true,
-    "opacity": 1.0,
-    "attribution": "国土地理院"
-},
-{
-    "id":"gsi_ort",
-    "name":"地理院タイル（オルソ画像）",
-    "url":"https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg",
-    "z_index": 1,
     "visible": false,
-    "opacity": 1.0,
     "attribution": "国土地理院"
-}
+  },
+  {
+    "id": "gsi_pale",
+    "name": "地理院タイル（淡色地図）",
+    "url": "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",
+    "z_index": 3,
+    "opacity": 1.0,
+    "visible": false,
+    "attribution": "国土地理院"
+  },
+  {
+    "id": "gsi_blank",
+    "name": "地理院タイル（白地図）",
+    "url": "https://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png",
+    "z_index": 2,
+    "opacity": 1.0,
+    "visible": false,
+    "attribution": "国土地理院"
+  },
+  {
+    "id": "gsi_ort",
+    "name": "地理院タイル（オルソ画像）",
+    "url": "https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg",
+    "z_index": 1,
+    "opacity": 1.0,
+    "visible": true,
+    "attribution": "国土地理院"
+  }
 ]

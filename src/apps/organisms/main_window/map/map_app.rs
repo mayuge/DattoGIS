@@ -64,6 +64,21 @@ impl MapApp {
         &self.map_instance
     }
 
+    pub fn set_layer_visibility(&mut self, id: &str, visible: bool, cx: &mut Context<Self>) {
+        let Some(layer) = self.raster_tile_layers.iter_mut().find(|layer| layer.id == id) else {
+            return;
+        };
+        if layer.visible == visible {
+            return;
+        }
+
+        layer.visible = visible;
+        if let Err(err) = LoadRasterTileConfig::save(&self.raster_tile_layers) {
+            eprintln!("{err}");
+        }
+        self.on_change_event(cx);
+    }
+
     /// 地図の状態変更を通知して再描画を要求する。
     fn on_change_event(&mut self, cx: &mut Context<Self>) {
         cx.emit(MapChanged);
