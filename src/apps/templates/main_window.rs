@@ -6,7 +6,9 @@ use gpui::*;
 use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
 use crate::apps::organisms::main_window::footer_app::FooterApp;
 use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
-use crate::apps::organisms::common::components::molecules::layer_item::LayerVisibilityChanged;
+use crate::apps::organisms::common::components::molecules::layer_item::{
+    LayerOpacityChanged, LayerVisibilityChanged,
+};
 use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::apps::organisms::main_window::search_app::SearchApp;
 
@@ -20,6 +22,7 @@ pub struct MainWindow {
     footer_app: Entity<FooterApp>,
     layer_controller_app: Entity<LayerControllerApp>,
     _layer_visibility_subscription: Subscription,
+    _layer_opacity_subscription: Subscription,
 }
 
 impl MainWindow {
@@ -38,6 +41,15 @@ impl MainWindow {
                 });
             },
         );
+        let map_app_for_layer_opacity_change = map_app.clone();
+        let _layer_opacity_subscription = cx.subscribe(
+            &layer_controller_app,
+            move |_, _, event: &LayerOpacityChanged, cx| {
+                let _ = map_app_for_layer_opacity_change.update(cx, |map_app, cx| {
+                    map_app.set_layer_opacity(&event.id, event.opacity, cx);
+                });
+            },
+        );
 
         Self {
             map_app,
@@ -45,6 +57,7 @@ impl MainWindow {
             footer_app,
             layer_controller_app,
             _layer_visibility_subscription,
+            _layer_opacity_subscription,
         }
     }
 }

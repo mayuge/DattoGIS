@@ -65,7 +65,11 @@ impl MapApp {
     }
 
     pub fn set_layer_visibility(&mut self, id: &str, visible: bool, cx: &mut Context<Self>) {
-        let Some(layer) = self.raster_tile_layers.iter_mut().find(|layer| layer.id == id) else {
+        let Some(layer) = self
+            .raster_tile_layers
+            .iter_mut()
+            .find(|layer| layer.id == id)
+        else {
             return;
         };
         if layer.visible == visible {
@@ -73,6 +77,26 @@ impl MapApp {
         }
 
         layer.visible = visible;
+        if let Err(err) = LoadRasterTileConfig::save(&self.raster_tile_layers) {
+            eprintln!("{err}");
+        }
+        self.on_change_event(cx);
+    }
+
+    pub fn set_layer_opacity(&mut self, id: &str, opacity: f32, cx: &mut Context<Self>) {
+        let Some(layer) = self
+            .raster_tile_layers
+            .iter_mut()
+            .find(|layer| layer.id == id)
+        else {
+            return;
+        };
+        let opacity = opacity.clamp(0.0, 1.0);
+        if (layer.opacity - opacity).abs() < f32::EPSILON {
+            return;
+        }
+
+        layer.opacity = opacity;
         if let Err(err) = LoadRasterTileConfig::save(&self.raster_tile_layers) {
             eprintln!("{err}");
         }
@@ -92,8 +116,11 @@ impl Render for MapApp {
         let viewport = window.viewport_size();
         let map_viewport =
             MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
-        let visible_tiles =
-            MapTile::calculate_visible_tiles(&self.map_instance, map_viewport.width, map_viewport.height);
+        let visible_tiles = MapTile::calculate_visible_tiles(
+            &self.map_instance,
+            map_viewport.width,
+            map_viewport.height,
+        );
         let map_app = cx.entity();
         let map_app_for_scroll = map_app.clone();
         let map_app_for_mouse_down = map_app.clone();
