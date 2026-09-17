@@ -16,12 +16,13 @@ use crate::domain::traits::load_vector_json_trait::LoadVectorJsonTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
+use crate::domain::traits::vector_repository_trait::VectorRepositoryTrait;
 use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
 use crate::domain::types::map_layer_type::{RasterTileLayer, VectorFeature, VectorLayer};
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
+use crate::infrastructure::duckdb::vector_repository::DuckDbVectorRepository;
 use crate::infrastructure::json::load_raster_tile_json::LoadRasterTileJson;
 use crate::infrastructure::json::load_vector_json::LoadVectorJson;
-use crate::infrastructure::vector::DuckDbVectorRepository;
 
 #[derive(Default)]
 struct DragState {
@@ -53,15 +54,13 @@ impl MapApp {
 
         let vector_layers = LoadVectorJson::load()
             .into_iter()
-            .filter_map(
-                |layer| match DuckDbVectorRepository::load_features(&layer) {
-                    Ok(features) => Some((layer, features)),
-                    Err(err) => {
-                        eprintln!("failed to load vector layer: {err:#}");
-                        None
-                    }
-                },
-            )
+            .filter_map(|layer| match DuckDbVectorRepository.load_features(&layer) {
+                Ok(features) => Some((layer, features)),
+                Err(err) => {
+                    eprintln!("failed to load vector layer: {err:#}");
+                    None
+                }
+            })
             .collect();
 
         Self {

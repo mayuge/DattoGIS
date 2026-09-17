@@ -5,4 +5,6 @@ pub mod load_vector_json_trait;
 pub mod map_area_trait;
 pub mod map_event_trait;
 pub mod map_tile_trait;
+pub mod vector_layer_service_trait;
+pub mod vector_repository_trait;
 pub mod world_pixel_trait;
