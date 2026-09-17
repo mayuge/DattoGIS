@@ -1,10 +1,30 @@
-[ {
+[
+  {
     "id": "airport",
     "name": "空港",
     "path": "assets/geo/airport.geojson",
     "z_index": 4,
     "opacity": 1.0,
+    "visible": false,
+    "attribution": "国土数値情報",
+    "style": {
+      "fill_color": "#f59e0b",
+      "stroke_color": "#ffffff",
+      "stroke_width": 1.0
+    }
+  },
+  {
+    "id": "railway",
+    "name": "鉄道",
+    "path": "assets/geo/railway.geojson",
+    "z_index": 5,
+    "opacity": 1.0,
     "visible": true,
-    "attribution": "国土数値情報"
+    "attribution": "国土数値情報",
+    "style": {
+      "fill_color": "#f59e0b",
+      "stroke_color": "#ffffff",
+      "stroke_width": 1.0
+    }
   }
 ]

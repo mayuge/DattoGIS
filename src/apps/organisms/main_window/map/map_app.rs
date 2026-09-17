@@ -5,19 +5,23 @@ use crate::apps::organisms::common::services::map::use_map_event::MapEvent;
 use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
 use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::apps::organisms::main_window::map::raster_tile_layer_app::RasterTileLayerApp;
+use crate::apps::organisms::main_window::map::vector_layer_app::VectorLayerApp;
 use crate::domain::params::design_token_config::{HEADER_HEIGHT, LAYER_CONTROLLER_WIDTH};
 use crate::domain::params::map_config::{
     DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE, MAP_SCROLL_LINE_DELTA_PIXELS,
 };
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
+use crate::domain::traits::load_vector_json_trait::LoadVectorJsonTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
-use crate::domain::types::map_layer_type::RasterTileLayer;
+use crate::domain::types::map_layer_type::{RasterTileLayer, VectorFeature, VectorLayer};
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 use crate::infrastructure::json::load_raster_tile_json::LoadRasterTileJson;
+use crate::infrastructure::json::load_vector_json::LoadVectorJson;
+use crate::infrastructure::vector::DuckDbVectorRepository;
 
 #[derive(Default)]
 struct DragState {
@@ -30,6 +34,7 @@ pub struct MapChanged;
 pub struct MapApp {
     map_instance: MapInstance,
     raster_tile_layers: Vec<RasterTileLayer>,
+    vector_layers: Vec<(VectorLayer, Vec<VectorFeature>)>,
     drag_state: DragState,
 }
 
@@ -46,9 +51,23 @@ impl MapApp {
             })
             .expect("failed to convert initial map center to Web Mercator");
 
+        let vector_layers = LoadVectorJson::load()
+            .into_iter()
+            .filter_map(
+                |layer| match DuckDbVectorRepository::load_features(&layer) {
+                    Ok(features) => Some((layer, features)),
+                    Err(err) => {
+                        eprintln!("failed to load vector layer: {err:#}");
+                        None
+                    }
+                },
+            )
+            .collect();
+
         Self {
             map_instance: MapInstance::new(center),
             raster_tile_layers: LoadRasterTileJson::load(),
+            vector_layers,
             drag_state: DragState::default(),
         }
     }
@@ -65,40 +84,74 @@ impl MapApp {
     }
 
     pub fn set_layer_visibility(&mut self, id: &str, visible: bool, cx: &mut Context<Self>) {
-        let Some(layer) = self
+        if let Some(layer) = self
             .raster_tile_layers
             .iter_mut()
             .find(|layer| layer.id == id)
-        else {
+        {
+            if layer.visible == visible {
+                return;
+            }
+            layer.visible = visible;
+            if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
+                eprintln!("{err}");
+            }
+        } else if let Some((layer, _)) = self
+            .vector_layers
+            .iter_mut()
+            .find(|(layer, _)| layer.id == id)
+        {
+            if layer.visible == visible {
+                return;
+            }
+            layer.visible = visible;
+            let layers = self
+                .vector_layers
+                .iter()
+                .map(|(layer, _)| layer.clone())
+                .collect::<Vec<_>>();
+            if let Err(err) = LoadVectorJson::save(&layers) {
+                eprintln!("{err}");
+            }
+        } else {
             return;
-        };
-        if layer.visible == visible {
-            return;
-        }
-
-        layer.visible = visible;
-        if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
-            eprintln!("{err}");
         }
         self.on_change_event(cx);
     }
 
     pub fn set_layer_opacity(&mut self, id: &str, opacity: f32, cx: &mut Context<Self>) {
-        let Some(layer) = self
+        let opacity = opacity.clamp(0.0, 1.0);
+        if let Some(layer) = self
             .raster_tile_layers
             .iter_mut()
             .find(|layer| layer.id == id)
-        else {
+        {
+            if (layer.opacity - opacity).abs() < f32::EPSILON {
+                return;
+            }
+            layer.opacity = opacity;
+            if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
+                eprintln!("{err}");
+            }
+        } else if let Some((layer, _)) = self
+            .vector_layers
+            .iter_mut()
+            .find(|(layer, _)| layer.id == id)
+        {
+            if (layer.opacity - opacity).abs() < f32::EPSILON {
+                return;
+            }
+            layer.opacity = opacity;
+            let layers = self
+                .vector_layers
+                .iter()
+                .map(|(layer, _)| layer.clone())
+                .collect::<Vec<_>>();
+            if let Err(err) = LoadVectorJson::save(&layers) {
+                eprintln!("{err}");
+            }
+        } else {
             return;
-        };
-        let opacity = opacity.clamp(0.0, 1.0);
-        if (layer.opacity - opacity).abs() < f32::EPSILON {
-            return;
-        }
-
-        layer.opacity = opacity;
-        if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
-            eprintln!("{err}");
         }
         self.on_change_event(cx);
     }
@@ -187,6 +240,12 @@ impl Render for MapApp {
             .child(RasterTileLayerApp::render(
                 visible_tiles,
                 self.raster_tile_layers.clone(),
+            ))
+            .child(VectorLayerApp::render(
+                &self.map_instance,
+                map_viewport.width,
+                map_viewport.height,
+                self.vector_layers.clone(),
             ))
     }
 }

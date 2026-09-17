@@ -3,10 +3,12 @@ use crate::apps::organisms::common::components::molecules::layer_item::{
 };
 use crate::domain::params::design_token_config::{
     ACTIVITY_BAR_WIDTH, BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, HEADER_HEIGHT,
-    LAYER_CONTROLLER_WIDTH, SPACE_MD,
+    LAYER_CONTROLLER_WIDTH,
 };
 use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
+use crate::domain::traits::load_vector_json_trait::LoadVectorJsonTrait;
 use crate::infrastructure::json::load_raster_tile_json::LoadRasterTileJson;
+use crate::infrastructure::json::load_vector_json::LoadVectorJson;
 use gpui::*;
 
 pub struct LayerControllerApp {
@@ -20,7 +22,7 @@ impl EventEmitter<LayerOpacityChanged> for LayerControllerApp {}
 impl LayerControllerApp {
     /// レイヤー操作パネルを初期化する。
     pub fn new(cx: &mut Context<Self>) -> Self {
-        let layers: Vec<_> = LoadRasterTileJson::load()
+        let mut layers: Vec<_> = LoadRasterTileJson::load()
             .into_iter()
             .map(|layer| {
                 cx.new(|cx| {
@@ -28,6 +30,9 @@ impl LayerControllerApp {
                 })
             })
             .collect();
+        layers.extend(LoadVectorJson::load().into_iter().map(|layer| {
+            cx.new(|cx| LayerItem::new(&layer.id, &layer.name, layer.visible, layer.opacity, cx))
+        }));
         let _layer_subscriptions = layers
             .iter()
             .flat_map(|layer| {

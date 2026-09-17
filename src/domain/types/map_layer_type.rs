@@ -29,3 +29,9 @@ pub struct VectorStyle {
     pub stroke_color: String,
     pub stroke_width: f32,
 }
+
+#[derive(Clone, Debug)]
+pub struct VectorFeature {
+    pub geometry_wkb: Vec<u8>,
+    pub properties: serde_json::Value,
+}
