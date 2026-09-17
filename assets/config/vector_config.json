@@ -1,0 +1,10 @@
+[ {
+    "id": "airport",
+    "name": "空港",
+    "path": "assets/geo/airport.geojson",
+    "z_index": 4,
+    "opacity": 1.0,
+    "visible": true,
+    "attribution": "国土数値情報"
+  }
+]

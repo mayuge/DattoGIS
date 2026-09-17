@@ -1,9 +1,9 @@
-use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
+use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
 
-pub struct LoadRasterTileConfig;
+pub struct LoadRasterTileJson;
 
-impl LoadRasterTileConfigTrait for LoadRasterTileConfig {
+impl LoadRasterTileJsonTrait for LoadRasterTileJson {
     // JSONファイルからラスタタイルの設定を読み込み
     /// ラスタータイルレイヤー設定を JSON ファイルから読み込む。
     fn load() -> Vec<RasterTileLayer> {

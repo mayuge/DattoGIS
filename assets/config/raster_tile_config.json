@@ -5,7 +5,7 @@
     "url": "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
     "z_index": 4,
     "opacity": 1.0,
-    "visible": false,
+    "visible": true,
     "attribution": "国土地理院"
   },
   {
@@ -32,7 +32,7 @@
     "url": "https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg",
     "z_index": 1,
     "opacity": 1.0,
-    "visible": true,
+    "visible": false,
     "attribution": "国土地理院"
   }
 ]

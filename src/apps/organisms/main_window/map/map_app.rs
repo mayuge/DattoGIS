@@ -10,14 +10,14 @@ use crate::domain::params::map_config::{
     DATA_PROJ_EPSG, MAP_CENTER_LATITUDE, MAP_CENTER_LONGITUDE, MAP_SCROLL_LINE_DELTA_PIXELS,
 };
 use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
-use crate::domain::traits::load_raster_tile_config_trait::LoadRasterTileConfigTrait;
+use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
 use crate::domain::types::map_layer_type::RasterTileLayer;
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
-use crate::infrastructure::json::load_raster_tile_config::LoadRasterTileConfig;
+use crate::infrastructure::json::load_raster_tile_json::LoadRasterTileJson;
 
 #[derive(Default)]
 struct DragState {
@@ -48,7 +48,7 @@ impl MapApp {
 
         Self {
             map_instance: MapInstance::new(center),
-            raster_tile_layers: LoadRasterTileConfig::load(),
+            raster_tile_layers: LoadRasterTileJson::load(),
             drag_state: DragState::default(),
         }
     }
@@ -77,7 +77,7 @@ impl MapApp {
         }
 
         layer.visible = visible;
-        if let Err(err) = LoadRasterTileConfig::save(&self.raster_tile_layers) {
+        if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
             eprintln!("{err}");
         }
         self.on_change_event(cx);
@@ -97,7 +97,7 @@ impl MapApp {
         }
 
         layer.opacity = opacity;
-        if let Err(err) = LoadRasterTileConfig::save(&self.raster_tile_layers) {
+        if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
             eprintln!("{err}");
         }
         self.on_change_event(cx);
