@@ -20,21 +20,36 @@ impl RasterTileLayerApp {
             .collect();
         layers.sort_by_key(|layer| layer.z_index);
 
-        div()
-            .image_cache(retain_all("raster-tile-cache"))
-            .children(layers.into_iter().flat_map(|layer| {
-                let opacity = layer.opacity;
-                let url = layer.url.clone();
+        let mut rendered_tiles = Vec::new();
+        let mut fully_visible_layer_found = false;
 
-                visible_tiles.iter().map(move |tile| {
+        for layer in layers {
+            if fully_visible_layer_found {
+                break;
+            }
+
+            let opacity = layer.opacity;
+            let url = layer.url.clone();
+
+            for tile in &visible_tiles {
+                rendered_tiles.push(
                     img(SharedString::from(tile.generate_tile_url(&url)))
                         .absolute()
                         .left(px(tile.draw_x))
                         .top(px(tile.draw_y))
                         .w(px(RASTER_TILE_SIZE as f32))
                         .h(px(RASTER_TILE_SIZE as f32))
-                        .opacity(opacity)
-                })
-            }))
+                        .opacity(opacity),
+                );
+            }
+
+            if (opacity - 1.0).abs() < f32::EPSILON {
+                fully_visible_layer_found = true;
+            }
+        }
+
+        div()
+            .image_cache(retain_all("raster-tile-cache"))
+            .children(rendered_tiles)
     }
 }

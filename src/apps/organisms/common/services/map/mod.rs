@@ -1,4 +1,6 @@
 //! 地図関連サービス
+pub mod map_render_service;
+pub mod map_state_service;
 pub mod use_map_area;
 pub mod use_map_bbox;
 pub mod use_map_event;
