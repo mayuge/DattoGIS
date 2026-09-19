@@ -28,7 +28,7 @@ pub struct MainWindow {
 impl MainWindow {
     /// 各 organism を生成して画面を構成する。
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let map_app = cx.new(MapApp::new);
+        let map_app = cx.new(|cx| MapApp::new(window, cx));
         let search_app = cx.new(|cx| SearchApp::new(window, map_app.clone(), cx));
         let footer_app = cx.new(|cx| FooterApp::new(map_app.clone(), cx));
         let layer_controller_app = cx.new(LayerControllerApp::new);

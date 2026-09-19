@@ -2,7 +2,7 @@ use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::domain::params::map_config::RASTER_TILE_SIZE;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::types::map_layer_type::RasterTileLayer;
-use gpui::*;
+use gpui::{IntoElement, ParentElement, SharedString, Styled, div, img, px, retain_all};
 
 pub struct RasterTileLayerApp;
 
@@ -20,19 +20,21 @@ impl RasterTileLayerApp {
             .collect();
         layers.sort_by_key(|layer| layer.z_index);
 
-        div().children(layers.into_iter().flat_map(|layer| {
-            let opacity = layer.opacity;
-            let url = layer.url.clone();
+        div()
+            .image_cache(retain_all("raster-tile-cache"))
+            .children(layers.into_iter().flat_map(|layer| {
+                let opacity = layer.opacity;
+                let url = layer.url.clone();
 
-            visible_tiles.iter().map(move |tile| {
-                img(SharedString::from(tile.generate_tile_url(&url)))
-                    .absolute()
-                    .left(px(tile.draw_x))
-                    .top(px(tile.draw_y))
-                    .w(px(RASTER_TILE_SIZE as f32))
-                    .h(px(RASTER_TILE_SIZE as f32))
-                    .opacity(opacity)
-            })
-        }))
+                visible_tiles.iter().map(move |tile| {
+                    img(SharedString::from(tile.generate_tile_url(&url)))
+                        .absolute()
+                        .left(px(tile.draw_x))
+                        .top(px(tile.draw_y))
+                        .w(px(RASTER_TILE_SIZE as f32))
+                        .h(px(RASTER_TILE_SIZE as f32))
+                        .opacity(opacity)
+                })
+            }))
     }
 }

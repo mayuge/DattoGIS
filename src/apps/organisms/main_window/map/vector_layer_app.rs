@@ -1,47 +1,20 @@
 use gpui::{PathBuilder, Styled, canvas, point, px, rgb};
 
-use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
-use crate::apps::organisms::common::services::map::vector_layer_service::VectorLayerService;
 use crate::domain::params::design_token_config::COLOR_WARNING;
-use crate::domain::traits::vector_layer_service_trait::{ScreenGeometry, VectorLayerServiceTrait};
-use crate::domain::types::map_layer_type::{VectorFeature, VectorLayer};
+use crate::domain::traits::vector_layer_service_trait::ScreenGeometry;
+use crate::domain::types::map_layer_type::VectorStyle;
 
 pub struct VectorLayerApp;
 
 impl VectorLayerApp {
-    pub fn render(
-        map: &MapInstance,
-        width: f32,
-        height: f32,
-        layers: Vec<(VectorLayer, Vec<VectorFeature>)>,
-    ) -> impl gpui::IntoElement {
-        let center = map.center;
-        let zoom_level = map.zoom_level.round() as u32;
-        let mut visible_layers: Vec<_> = layers
-            .into_iter()
-            .filter(|(layer, _)| layer.visible)
-            .collect();
-        visible_layers.sort_by_key(|(layer, _)| layer.z_index);
-
+    pub fn render(layers: Vec<(VectorStyle, f32, Vec<ScreenGeometry>)>) -> impl gpui::IntoElement {
+        let prepaint_layers = layers.clone();
         canvas(
-            move |_, _, _| {
-                visible_layers
-                    .into_iter()
-                    .map(|(layer, features)| (layer.style.clone(), layer.opacity, features.clone()))
-                    .collect::<Vec<_>>()
-            },
-            move |bounds, layers, window, _| {
-                let center_x = f64::from(bounds.origin.x) + f64::from(width) / 2.0;
-                let center_y = f64::from(bounds.origin.y) + f64::from(height) / 2.0;
-                let service = VectorLayerService;
-                for (style, opacity, features) in layers {
+            move |_, _, _| prepaint_layers,
+            move |_, layers, window, _| {
+                for (style, opacity, geometries) in layers {
                     let color = parse_color(&style.fill_color).alpha(opacity);
-                    for geometry in service.screen_geometries(
-                        &features,
-                        center,
-                        zoom_level,
-                        (center_x, center_y),
-                    ) {
+                    for geometry in geometries {
                         match geometry {
                             ScreenGeometry::Point((x, y)) => {
                                 let radius = px(4.0);
