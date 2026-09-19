@@ -1,11 +1,20 @@
 [
   {
+    "id": "osm",
+    "name": "OpenStreetMap",
+    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "z_index": 5,
+    "opacity": 1.0,
+    "visible": true,
+    "attribution": "© OpenStreetMap contributors"
+  },
+  {
     "id": "gsi_std",
     "name": "地理院タイル（標準地図）",
     "url": "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
     "z_index": 4,
-    "opacity": 1.0,
-    "visible": true,
+    "opacity": 0.4,
+    "visible": false,
     "attribution": "国土地理院"
   },
   {
