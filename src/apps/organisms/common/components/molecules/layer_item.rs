@@ -3,7 +3,7 @@ use gpui::*;
 use crate::apps::organisms::common::components::atoms::checkbox::{Checkbox, CheckboxChanged};
 use crate::apps::organisms::common::components::atoms::slider::{Slider, SliderChanged};
 use crate::domain::params::design_token_config::{
-    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, COLOR_TEXT, SPACE_SM,
+    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, COLOR_TEXT, SPACE_SM, SPACE_XS,
 };
 
 pub struct LayerItem {
@@ -78,11 +78,11 @@ impl Render for LayerItem {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .w_full()
-            .px_2()
+            .pl_2()
+            .pr_4()
             .pt(px(SPACE_SM))
             .flex()
             .flex_col()
-            .gap(px(SPACE_SM))
             .text_xs()
             .justify_start()
             .border_b(px(BORDER_WEIGHT))

@@ -7,18 +7,17 @@ use gpui::{IntoElement, ParentElement, SharedString, Styled, div, img, px, retai
 pub struct RasterTileLayerApp;
 
 impl RasterTileLayerApp {
-    /// 可視レイヤーのタイル画像を z-index 順に描画する。
+    /// 可視レイヤーのタイル画像を設定順に描画する。
     pub fn render(
         //各タイルの{z}{x}{y}の数値のリストを保持
         visible_tiles: Vec<MapTile>,
         //レイヤーのリスト
         raster_tile_layers: Vec<RasterTileLayer>,
     ) -> impl IntoElement {
-        let mut layers: Vec<_> = raster_tile_layers
+        let layers: Vec<_> = raster_tile_layers
             .into_iter()
             .filter(|layer| layer.visible)
             .collect();
-        layers.sort_by_key(|layer| layer.z_index);
 
         let mut rendered_tiles = Vec::new();
         let mut fully_visible_layer_found = false;
@@ -49,6 +48,8 @@ impl RasterTileLayerApp {
         }
 
         div()
+            .absolute()
+            .size_full()
             .image_cache(retain_all("raster-tile-cache"))
             .children(rendered_tiles)
     }

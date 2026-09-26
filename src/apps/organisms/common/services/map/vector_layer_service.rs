@@ -12,6 +12,7 @@ impl VectorLayerServiceTrait for VectorLayerService {
     fn screen_geometries(
         &self,
         features: &[VectorFeature],
+        epsg: u32,
         center: WebMercatorCoordinate,
         zoom_level: u32,
         viewport_center: (f64, f64),
@@ -23,19 +24,17 @@ impl VectorLayerServiceTrait for VectorLayerService {
             .filter_map(|geometry| match geometry {
                 Geometry::Point(position) => project_geometry(
                     vec![position],
+                    epsg,
                     center_pixel,
                     zoom_level,
                     viewport_center,
                 )
                 .and_then(|positions| positions.first().copied())
                 .map(ScreenGeometry::Point),
-                Geometry::LineString(positions) => project_geometry(
-                    positions,
-                    center_pixel,
-                    zoom_level,
-                    viewport_center,
-                )
-                .map(ScreenGeometry::LineString),
+                Geometry::LineString(positions) => {
+                    project_geometry(positions, epsg, center_pixel, zoom_level, viewport_center)
+                        .map(ScreenGeometry::LineString)
+                }
             })
             .collect()
     }
@@ -78,6 +77,7 @@ fn read_wkb(wkb: &[u8]) -> Option<Geometry> {
 
 fn project_geometry(
     positions: Vec<(f64, f64)>,
+    epsg: u32,
     center_pixel: WorldPixel,
     zoom_level: u32,
     viewport_center: (f64, f64),
@@ -89,7 +89,7 @@ fn project_geometry(
                 .epsg_coordinate_to_web_mercator(EpsgCoordinate {
                     x: longitude,
                     y: latitude,
-                    epsg: 4326,
+                    epsg,
                 })
                 .ok()?;
             let pixel = WorldPixel::convert_coordinate_to_pixel(&coordinate, zoom_level);

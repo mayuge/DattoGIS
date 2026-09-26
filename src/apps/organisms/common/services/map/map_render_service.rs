@@ -1,20 +1,12 @@
-use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
 use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::apps::organisms::common::services::map::vector_layer_service::VectorLayerService;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
 use crate::domain::traits::vector_layer_service_trait::{ScreenGeometry, VectorLayerServiceTrait};
+use crate::domain::types::geometry_cache_key_type::GeometryCacheKey;
+use crate::domain::types::map_instance_type::MapInstance;
 use crate::domain::types::map_layer_type::{VectorFeature, VectorLayer, VectorStyle};
 
 pub type VectorGeometryCacheEntry = (VectorStyle, f32, Vec<ScreenGeometry>);
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct GeometryCacheKey {
-    pub zoom_level: u32,
-    pub center_x: i64,
-    pub center_y: i64,
-    pub viewport_width: i32,
-    pub viewport_height: i32,
-}
 
 /// 表示用の計算をまとめる純粋なサービス。
 ///
@@ -29,7 +21,7 @@ impl MapRenderService {
         viewport_width: f32,
         viewport_height: f32,
     ) -> GeometryCacheKey {
-        let zoom_level = map.zoom_level.round() as u32;
+        let zoom_level = map.zoom_level;
         let center_x = map.center.x.round() as i64;
         let center_y = map.center.y.round() as i64;
 
@@ -58,7 +50,7 @@ impl MapRenderService {
         viewport_center: (f64, f64),
     ) -> Vec<VectorGeometryCacheEntry> {
         let service = VectorLayerService;
-        let zoom_level = map.zoom_level.round() as u32;
+        let zoom_level = map.zoom_level;
 
         vector_layers
             .iter()
@@ -67,7 +59,13 @@ impl MapRenderService {
                 (
                     layer.style.clone(),
                     layer.opacity,
-                    service.screen_geometries(features, map.center, zoom_level, viewport_center),
+                    service.screen_geometries(
+                        features,
+                        layer.epsg,
+                        map.center,
+                        zoom_level,
+                        viewport_center,
+                    ),
                 )
             })
             .collect()

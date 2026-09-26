@@ -11,6 +11,7 @@ pub trait VectorLayerServiceTrait {
     fn screen_geometries(
         &self,
         features: &[VectorFeature],
+        epsg: u32,
         center: WebMercatorCoordinate,
         zoom_level: u32,
         viewport_center: (f64, f64),

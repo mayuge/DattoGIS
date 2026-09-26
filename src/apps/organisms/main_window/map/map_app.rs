@@ -1,7 +1,7 @@
 use gpui::*;
 
 use crate::apps::organisms::common::services::map::map_render_service::{
-    GeometryCacheKey, MapRenderService, VectorGeometryCacheEntry,
+    MapRenderService, VectorGeometryCacheEntry,
 };
 use crate::apps::organisms::common::services::map::map_state_service::MapStateService;
 use crate::apps::organisms::common::services::map::use_map_area::MapArea;
@@ -19,6 +19,7 @@ use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
 use crate::domain::traits::load_vector_json_trait::LoadVectorJsonTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use crate::domain::traits::vector_repository_trait::VectorRepositoryTrait;
+use crate::domain::types::geometry_cache_key_type::GeometryCacheKey;
 use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
 use crate::domain::types::map_layer_type::{RasterTileLayer, VectorFeature, VectorLayer};
 use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;

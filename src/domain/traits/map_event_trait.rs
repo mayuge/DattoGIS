@@ -1,4 +1,4 @@
-use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
+use crate::domain::types::map_instance_type::MapInstance;
 
 pub trait MapEventTrait {
     /// スクロール操作を地図のズーム変更として適用する。

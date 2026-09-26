@@ -34,12 +34,12 @@ pub const MAP_MAX_LATITUDE: f64 = 85.0511287798;
 pub const WEB_MERCATOR_HALF_WORLD_WIDTH: f64 = 20_037_508.342_789_244;
 
 /// 初期ズームレベル
-pub const MAP_ZOOM_LEVEL: f64 = 18.0;
+pub const MAP_ZOOM_LEVEL: u32 = 18;
 
 /// ズームレベルの制限
-pub const MAP_MAX_ZOOM_LEVEL: f64 = 24.0;
+pub const MAP_MAX_ZOOM_LEVEL: u32 = 24;
 
-pub const MAP_MIN_ZOOM_LEVEL: f64 = 0.0;
+pub const MAP_MIN_ZOOM_LEVEL: u32 = 0;
 
 /// 1行分のホイールスクロールをピクセル量へ換算する係数
 pub const MAP_SCROLL_LINE_DELTA_PIXELS: f32 = 20.0;

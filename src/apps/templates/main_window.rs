@@ -3,12 +3,12 @@ use crate::domain::params::app_config::*;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
 use gpui::*;
 
-use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
-use crate::apps::organisms::main_window::footer_app::FooterApp;
-use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
 use crate::apps::organisms::common::components::molecules::layer_item::{
     LayerOpacityChanged, LayerVisibilityChanged,
 };
+use crate::apps::organisms::main_window::activity_bar_app::ActivityBarApp;
+use crate::apps::organisms::main_window::footer_app::FooterApp;
+use crate::apps::organisms::main_window::layer_controller_app::LayerControllerApp;
 use crate::apps::organisms::main_window::map::map_app::MapApp;
 use crate::apps::organisms::main_window::search_app::SearchApp;
 
@@ -64,6 +64,7 @@ impl MainWindow {
 
 impl Render for MainWindow {
     /// ウィンドウ内の各 organism と照準を配置する。
+    #[allow(refining_impl_trait_reachable)]
     fn render(&mut self, window: &mut Window, _cx: &mut Context<Self>) -> AnyElement {
         let viewport = window.viewport_size();
         let map_area =

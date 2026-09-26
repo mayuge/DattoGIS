@@ -1,4 +1,4 @@
-use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
+use crate::domain::types::map_instance_type::MapInstance;
 
 pub trait MapTileTrait: Sized {
     /// タイル URL テンプレートを具体的な URL に展開する。

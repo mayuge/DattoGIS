@@ -10,21 +10,22 @@ impl MapEventTrait for MapEvent {
     //マップズーム
     /// スクロール量に応じてズームレベルを一段階更新する。
     fn zoom_by_scroll(map: &mut MapInstance, scroll_delta_y: f32) {
-        let zoom_step = if scroll_delta_y > 0.0 {
-            1.0
+        map.zoom_level = if scroll_delta_y > 0.0 {
+            map.zoom_level.saturating_add(1)
         } else if scroll_delta_y < 0.0 {
-            -1.0
+            map.zoom_level.saturating_sub(1)
         } else {
-            0.0
+            map.zoom_level
         };
-
-        map.zoom_level = (map.zoom_level + zoom_step).clamp(MAP_MIN_ZOOM_LEVEL, MAP_MAX_ZOOM_LEVEL);
+        map.zoom_level = map
+            .zoom_level
+            .clamp(MAP_MIN_ZOOM_LEVEL, MAP_MAX_ZOOM_LEVEL);
     }
 
     //マップ移動
     /// ドラッグしたピクセル量に応じて地図中心を移動する。
     fn pan_by_pixels(map: &mut MapInstance, delta_x: f32, delta_y: f32) {
-        let zoom_level = map.zoom_level.round() as u32;
+        let zoom_level = map.zoom_level;
         //WEB_MERCATOR_HALF_WORLD_WIDTHは、メートル換算したWeb Mercatorの原点から東西端(円周の半分)×円周率(π)の値
         //世界全体の投影幅 2πR（約 40,075km）、WEB_MERCATOR_HALF_WORLD_WIDTH * 2.0
         //meters_per_pixelでは、RASTER_TILE_SIZE=256pxとして、ズームレベルの数だけ累乗した結果、RASTER_TILE_SIZE × 2^zoom_level

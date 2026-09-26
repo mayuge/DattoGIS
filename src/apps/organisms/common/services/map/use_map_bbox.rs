@@ -10,7 +10,7 @@ pub struct MapBbox;
 
 impl MapBbox {
     pub fn calculate(map: &MapInstance, width: f32, height: f32) -> (f64, f64, f64, f64) {
-        let zoom_level = map.zoom_level.round() as u32;
+        let zoom_level = map.zoom_level;
         let center = WorldPixel::convert_coordinate_to_pixel(&map.center, zoom_level);
         let world_width = WEB_MERCATOR_HALF_WORLD_WIDTH * 2.0;
         let world_size = 256.0 * (1u32 << zoom_level) as f64;

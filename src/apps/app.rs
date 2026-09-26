@@ -1,5 +1,5 @@
 use gpui::*;
-use gpui_component::{init as init_gpui_component, Root};
+use gpui_component::{Root, init as init_gpui_component};
 use gpui_platform::application;
 use std::sync::Arc;
 

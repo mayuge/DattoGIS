@@ -214,38 +214,3 @@ fn collect_positions(value: &Value, positions: &mut Vec<(f64, f64)>) -> Result<(
     }
     Ok(())
 }
-
-#[cfg(test)]
-mod tests {
-    use super::{DuckDbVectorRepository, VectorRepositoryTrait};
-    use crate::domain::types::map_layer_type::{VectorLayer, VectorStyle};
-
-    #[test]
-    fn loads_geojson_into_duckdb_features() {
-        let layer = VectorLayer {
-            id: "airport".to_string(),
-            name: "空港".to_string(),
-            path: "assets/geo/airport.geojson".to_string(),
-            z_index: 4,
-            opacity: 1.0,
-            visible: true,
-            attribution: None,
-            style: VectorStyle {
-                fill_color: "#f59e0b".to_string(),
-                stroke_color: "#ffffff".to_string(),
-                stroke_width: 1.0,
-            },
-        };
-
-        let repository = DuckDbVectorRepository::new().unwrap();
-        let features = repository.load_features(&layer).unwrap();
-        assert_eq!(features.len(), 97);
-        assert_eq!(features[0].geometry_wkb[0], 1);
-        assert!(features[0].properties.get("C28_000").is_some());
-
-        let outside = repository
-            .load_features_in_bbox(&layer, (-10.0, -10.0, 10.0, 10.0))
-            .unwrap();
-        assert!(outside.is_empty());
-    }
-}

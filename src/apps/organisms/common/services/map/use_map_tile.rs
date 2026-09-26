@@ -41,7 +41,7 @@ impl MapTileTrait for MapTile {
         viewport_width: f32,
         viewport_height: f32,
     ) -> Vec<Self> {
-        let zoom_level = map.zoom_level.round() as u32;
+        let zoom_level = map.zoom_level as u32;
 
         let world_pixel = WorldPixel::convert_coordinate_to_pixel(&map.center, zoom_level);
 
