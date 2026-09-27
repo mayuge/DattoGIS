@@ -35,9 +35,9 @@ impl MainWindow {
         let map_app_for_layer_change = map_app.clone();
         let _layer_visibility_subscription = cx.subscribe(
             &layer_controller_app,
-            move |_, _, event: &LayerVisibilityChanged, cx| {
+            move |_, _, _: &LayerVisibilityChanged, cx| {
                 let _ = map_app_for_layer_change.update(cx, |map_app, cx| {
-                    map_app.set_layer_visibility(&event.id, event.visible, cx);
+                    map_app.reload_layer_config(cx);
                 });
             },
         );

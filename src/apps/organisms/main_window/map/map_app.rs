@@ -252,41 +252,16 @@ impl MapApp {
         &self.map_instance
     }
 
-    /// 指定したレイヤーの表示状態を切り替え、設定を保存して再描画を要求する。
-    pub fn set_layer_visibility(&mut self, id: &str, visible: bool, cx: &mut Context<Self>) {
-        if let Some(layer) = self
-            .raster_tile_layers
-            .iter_mut()
-            .find(|layer| layer.id == id)
-        {
-            if layer.visible == visible {
-                return;
-            }
-            layer.visible = visible;
-            if let Err(err) = LoadRasterTileJson::save(&self.raster_tile_layers) {
-                eprintln!("{err}");
-            }
-        } else if let Some((layer, _)) = self
-            .vector_layers
-            .iter_mut()
-            .find(|(layer, _)| layer.id == id)
-        {
-            if layer.visible == visible {
-                return;
-            }
-            layer.visible = visible;
-            self.geometry_cache_key = None;
-            let layers = self
-                .vector_layers
-                .iter()
-                .map(|(layer, _)| layer.clone())
-                .collect::<Vec<_>>();
-            if let Err(err) = LoadVectorJson::save(&layers) {
-                eprintln!("{err}");
-            }
-        } else {
-            return;
-        }
+    /// レイヤー設定JSONを再読込して地図に反映する。
+    pub fn reload_layer_config(&mut self, cx: &mut Context<Self>) {
+        self.raster_tile_layers = LoadRasterTileJson::load();
+        self.vector_layers = MapStateService::reload_vector_layers(
+            &self.repository,
+            &self.map_instance,
+            self.viewport_width,
+            self.viewport_height,
+        );
+        self.geometry_cache_key = None;
         self.on_change_event(cx);
     }
 

@@ -42,11 +42,6 @@ impl RasterTileLayerApp {
                         .opacity(opacity),
                 );
             }
-
-            // レイヤーの透明度が1の場合は描画を終了する
-            if opacity >= 1.0 {
-                break;
-            }
         }
 
         div()

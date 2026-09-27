@@ -18,7 +18,7 @@
     "name": "鉄道",
     "path": "assets/geo/railway.geojson",
     "epsg": 4326,
-    "opacity": 1.0,
+    "opacity": 0.5,
     "visible": true,
     "attribution": "国土数値情報",
     "style": {

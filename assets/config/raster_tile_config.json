@@ -3,7 +3,7 @@
     "id": "osm",
     "name": "OpenStreetMap",
     "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    "opacity": 1.0,
+    "opacity": 0.6,
     "visible": true,
     "attribution": "© OpenStreetMap contributors"
   },
@@ -12,7 +12,7 @@
     "name": "地理院タイル（標準地図）",
     "url": "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
     "opacity": 1.0,
-    "visible": true,
+    "visible": false,
     "attribution": "国土地理院"
   },
   {
@@ -20,7 +20,7 @@
     "name": "地理院タイル（淡色地図）",
     "url": "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",
     "opacity": 1.0,
-    "visible": true,
+    "visible": false,
     "attribution": "国土地理院"
   },
   {
