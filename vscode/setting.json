@@ -1,5 +1,0 @@
-{
-  "rust-analyzer.linkedProjects": [
-    "source/datto_gis/Cargo.toml"
-  ]
-}

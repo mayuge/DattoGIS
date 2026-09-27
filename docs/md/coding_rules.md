@@ -1,1 +1,0 @@
-- 緯度経度はlat,lonなどと略さず、latitude、longitudeと表記する
