@@ -158,11 +158,7 @@ pub struct MapApp {
     viewport_height: f32,
     repository: DuckDbVectorRepository,
     geometry_cache_key: Option<GeometryCacheKey>,
-    geometry_cache: Vec<(
-        crate::domain::types::map_layer_type::VectorStyle,
-        f32,
-        Vec<crate::domain::traits::vector_layer_service_trait::ScreenGeometry>,
-    )>,
+    geometry_cache: Vec<VectorGeometryCacheEntry>,
 }
 
 impl EventEmitter<MapChanged> for MapApp {}
@@ -279,6 +275,7 @@ impl MapApp {
                 return;
             }
             layer.visible = visible;
+            self.geometry_cache_key = None;
             let layers = self
                 .vector_layers
                 .iter()
@@ -317,6 +314,13 @@ impl MapApp {
                 return;
             }
             layer.opacity = opacity;
+            if let Some((_, _, cached_opacity, _)) = self
+                .geometry_cache
+                .iter_mut()
+                .find(|(layer_id, _, _, _)| layer_id == id)
+            {
+                *cached_opacity = opacity;
+            }
             let layers = self
                 .vector_layers
                 .iter()

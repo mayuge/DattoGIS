@@ -27,7 +27,6 @@ impl LayerControllerApp {
         // レイヤーの設定を取得する
         let vector_layers: Vec<_> = LoadVectorJson::load()
             .into_iter()
-            .rev()
             .map(|layer| {
                 cx.new(|cx| {
                     LayerItem::new(&layer.id, &layer.name, layer.visible, layer.opacity, cx)

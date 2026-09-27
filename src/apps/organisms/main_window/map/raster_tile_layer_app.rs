@@ -20,16 +20,17 @@ impl RasterTileLayerApp {
             .collect();
 
         let mut rendered_tiles = Vec::new();
-        let mut fully_visible_layer_found = false;
 
-        for layer in layers {
-            if fully_visible_layer_found {
-                break;
-            }
-
+        for layer in layers.into_iter().rev() {
             let opacity = layer.opacity;
             let url = layer.url.clone();
 
+            //レイヤーの透明度が0の場合は描画しない
+            if opacity <= 0.0 {
+                continue;
+            }
+
+            // 各タイルのURLを生成して描画する
             for tile in &visible_tiles {
                 rendered_tiles.push(
                     img(SharedString::from(tile.generate_tile_url(&url)))
@@ -42,8 +43,9 @@ impl RasterTileLayerApp {
                 );
             }
 
-            if (opacity - 1.0).abs() < f32::EPSILON {
-                fully_visible_layer_found = true;
+            // レイヤーの透明度が1の場合は描画を終了する
+            if opacity >= 1.0 {
+                break;
             }
         }
 

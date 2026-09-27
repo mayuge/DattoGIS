@@ -1,18 +1,18 @@
 use gpui::{PathBuilder, Styled, canvas, point, px, rgb};
 
+use crate::apps::organisms::common::services::map::map_render_service::VectorGeometryCacheEntry;
 use crate::domain::params::design_token_config::COLOR_WARNING;
 use crate::domain::traits::vector_layer_service_trait::ScreenGeometry;
-use crate::domain::types::map_layer_type::VectorStyle;
 
 pub struct VectorLayerApp;
 
 impl VectorLayerApp {
-    pub fn render(layers: Vec<(VectorStyle, f32, Vec<ScreenGeometry>)>) -> impl gpui::IntoElement {
+    pub fn render(layers: Vec<VectorGeometryCacheEntry>) -> impl gpui::IntoElement {
         let prepaint_layers = layers.clone();
         canvas(
             move |_, _, _| prepaint_layers,
             move |_, layers, window, _| {
-                for (style, opacity, geometries) in layers {
+                for (_, style, opacity, geometries) in layers {
                     let color = parse_color(&style.fill_color).alpha(opacity);
                     for geometry in geometries {
                         match geometry {

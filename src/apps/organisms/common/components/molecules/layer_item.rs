@@ -3,7 +3,7 @@ use gpui::*;
 use crate::apps::organisms::common::components::atoms::checkbox::{Checkbox, CheckboxChanged};
 use crate::apps::organisms::common::components::atoms::slider::{Slider, SliderChanged};
 use crate::domain::params::design_token_config::{
-    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, COLOR_TEXT, SPACE_SM, SPACE_XS,
+    BORDER_WEIGHT, COLOR_COMPONENT_BASE, COLOR_GRAY_60, COLOR_TEXT, SPACE_SM,
 };
 
 pub struct LayerItem {

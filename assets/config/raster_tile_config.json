@@ -4,7 +4,7 @@
     "name": "OpenStreetMap",
     "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     "opacity": 1.0,
-    "visible": false,
+    "visible": true,
     "attribution": "© OpenStreetMap contributors"
   },
   {
@@ -36,7 +36,7 @@
     "name": "地理院タイル（オルソ画像）",
     "url": "https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg",
     "opacity": 1.0,
-    "visible": true,
+    "visible": false,
     "attribution": "国土地理院"
   }
 ]

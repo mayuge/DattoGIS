@@ -6,7 +6,7 @@ use crate::domain::types::geometry_cache_key_type::GeometryCacheKey;
 use crate::domain::types::map_instance_type::MapInstance;
 use crate::domain::types::map_layer_type::{VectorFeature, VectorLayer, VectorStyle};
 
-pub type VectorGeometryCacheEntry = (VectorStyle, f32, Vec<ScreenGeometry>);
+pub type VectorGeometryCacheEntry = (String, VectorStyle, f32, Vec<ScreenGeometry>);
 
 /// 表示用の計算をまとめる純粋なサービス。
 ///
@@ -54,9 +54,11 @@ impl MapRenderService {
 
         vector_layers
             .iter()
+            .rev()
             .filter(|(layer, _)| layer.visible)
             .map(|(layer, features)| {
                 (
+                    layer.id.clone(),
                     layer.style.clone(),
                     layer.opacity,
                     service.screen_geometries(
