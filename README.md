@@ -34,56 +34,79 @@ cargo run
 
 こうすることで、地図描画の状態管理、API通信、UIの配置、設定値管理を整理しやすくしています。
 
+## ベクターレイヤー
+ベクターレイヤーは `assets/config/vector_config.json` で定義し、GeoJSONファイルを読み込んで地図上に表示します。現在、Point、LineString、Polygon、MultiPolygonに対応しています。Polygonの内側リングは穴として塗り抜かれます。
+
+動作確認用のダミーデータは次の場所にあります。
+
+- `assets/geo/polygon.geojson`: 通常のPolygon
+- `assets/geo/multipolygon.geojson`: 穴を含むPolygonを含むMultiPolygon
+
+レイヤーごとの `epsg` を使ってWeb Mercatorへ座標変換し、`opacity` と `style` を描画に適用します。
+
 ## ディレクトリ構成
 
 ```text
 DattoGIS/
-├── assets/                     # アセット画像や地図関連の静的ファイル
-│   ├── activity_bar/
-│   ├── components/
-│   ├── config/
-│   ├── geo/
-│   ├── main_logo/
-│   ├── map/
-│   └── window/
-├── src/                        # ソースコード
-│   ├── main.rs                 # アプリケーションのエントリーポイント
-│   ├── apps/                   # アプリケーションUIの構成
-│   │   ├── app.rs              # ルートアプリ本体
-│   │   ├── mod.rs
-│   │   ├── organisms/          # 画面の機能単位コンポーネント
-│   │   │   ├── common/         # 共有コンポーネント・ユーティリティ
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── atoms/
-│   │   │   │   │   └── molecules/
-│   │   │   │   └── services/
-│   │   │   │       └── map/
-│   │   │   └── main_window/    # メイン画面の構成要素
-│   │   │       ├── activity_bar_app.rs
-│   │   │       ├── footer_app.rs
-│   │   │       ├── layer_controller_app.rs
-│   │   │       ├── search_app.rs
-│   │   │       ├── map/
-│   │   │       │   ├── map_app.rs
-│   │   │       │   ├── map_content_app.rs
-│   │   │       │   ├── map_viewport_app.rs
-│   │   │       │   ├── raster_tile_layer_app.rs
-│   │   │       │   ├── vector_layer_app.rs
-│   │   │       │   └── mod.rs
-│   │   │       └── mod.rs
-│   │   └── templates/
-│   │       ├── main_window.rs
-│   │       └── mod.rs
-│   ├── domain/                 # ドメイン定義
-│   │   ├── mod.rs
-│   │   ├── params/             # 設定値や定数
-│   │   │   ├── api_config.rs
-│   │   │   ├── app_config.rs
-│   │   │   ├── design_token_config.rs
-│   │   │   ├── map_config.rs
-│   │   │   ├── mod.rs
-│   │   │   └── text_config.rs
-│   │   ├── traits/             # 実装に依存しない振る舞い定義
+├── assets/                         # UI素材、設定、地理データ
+│   ├── activity_bar/               # サイドバーのアイコン
+│   ├── components/                 # チェックボックスなどの部品画像
+│   ├── config/                     # ラスター/ベクターレイヤーの設定JSON
+│   │   ├── raster_tile_config.json
+│   │   └── vector_config.json
+│   ├── geo/                        # GeoJSONのサンプル・表示データ
+│   │   ├── airport.geojson
+│   │   ├── multipolygon.geojson
+│   │   ├── polygon.geojson
+│   │   └── railway.geojson
+│   ├── main_logo/                  # アプリのロゴ
+│   ├── map/                        # 地図上の表示素材
+│   └── window/                     # ウィンドウ用素材
+├── src/
+│   ├── main.rs                     # アプリケーションの起動
+│   ├── apps/                       # GPUIによる画面・操作
+│   │   ├── app.rs                  # ルート画面とウィンドウ初期化
+│   │   ├── templates/
+│   │   │   ├── main_window.rs      # 各画面機能をまとめるメイン画面
+│   │   │   └── mod.rs
+│   │   └── organisms/
+│   │       ├── common/
+│   │       │   ├── components/
+│   │       │   │   ├── atoms/      # 単独で使えるUI部品
+│   │       │   │   │   ├── checkbox.rs     # 表示状態の切り替え
+│   │       │   │   │   ├── footer.rs       # フッター部品
+│   │       │   │   │   ├── header.rs       # ヘッダー部品
+│   │       │   │   │   ├── search_input.rs # 検索入力
+│   │       │   │   │   └── slider.rs       # 不透明度入力
+│   │       │   │   └── molecules/
+│   │       │   │       └── layer_item.rs   # チェックとスライダーを持つレイヤー行
+│   │       │   └── services/map/   # 表示部品から分離した地図計算
+│   │       │       ├── map_render_service.rs # 表示タイル・形状とキャッシュキー
+│   │       │       ├── map_state_service.rs  # 地図状態とレイヤー再読込
+│   │       │       ├── use_map_area.rs       # 地図表示領域の計算
+│   │       │       ├── use_map_bbox.rs       # 表示範囲の地理座標化
+│   │       │       ├── use_map_event.rs      # ズーム・パン操作
+│   │       │       ├── use_map_instance.rs   # MapInstanceの公開窓口
+│   │       │       ├── use_map_tile.rs       # XYZタイルの座標とURL
+│   │       │       ├── use_map_world_pixel.rs # 座標とワールドピクセルの変換
+│   │       │       └── vector_layer_service.rs # WKB形状の投影
+│   │       └── main_window/
+│   │           ├── activity_bar_app.rs       # 左側の機能バー
+│   │           ├── footer_app.rs             # 座標・ズーム等の表示
+│   │           ├── layer_controller_app.rs   # レイヤー設定の編集・保存
+│   │           ├── search_app.rs             # 地名・住所検索
+│   │           └── map/
+│   │               ├── map_app.rs          # 地図状態と操作の接続
+│   │               ├── raster_tile_layer_app.rs # ラスタータイル描画
+│   │               └── vector_layer_app.rs  # ベクター形状描画
+│   ├── domain/                     # UI/外部実装に依存しない型と契約
+│   │   ├── params/                 # アプリ・地図・デザイン等の定数
+│   │   │   ├── api_config.rs       # API接続設定
+│   │   │   ├── app_config.rs       # アプリ名・ウィンドウ設定
+│   │   │   ├── design_token_config.rs # 色・余白・サイズ
+│   │   │   ├── map_config.rs       # 投影・ズーム・タイル設定
+│   │   │   └── text_config.rs      # UI表示文字列
+│   │   ├── traits/                 # 外部実装に依存しない操作契約
 │   │   │   ├── coordinate_transformer_trait.rs
 │   │   │   ├── geocoding_trait.rs
 │   │   │   ├── load_raster_tile_json_trait.rs
@@ -91,28 +114,36 @@ DattoGIS/
 │   │   │   ├── map_area_trait.rs
 │   │   │   ├── map_event_trait.rs
 │   │   │   ├── map_tile_trait.rs
-│   │   │   ├── mod.rs
 │   │   │   ├── vector_layer_service_trait.rs
-│   │   │   └── vector_repository_trait.rs
-│   │   └── types/              # ドメインの型定義
+│   │   │   ├── vector_repository_trait.rs
+│   │   │   └── world_pixel_trait.rs
+│   │   └── types/                  # 座標、地図状態、レイヤー、検索結果
 │   │       ├── geocoding_type.rs
+│   │       ├── geometry_cache_key_type.rs
 │   │       ├── map_coordinate_type.rs
-│   │       ├── map_layer_type.rs
-│   │       └── mod.rs
-│   └── infrastructure/         # 外部依存の具体実装
-│       ├── client/
-│       │   └── index.rs
+│   │       ├── map_instance_type.rs
+│   │       └── map_layer_type.rs
+│   └── infrastructure/             # 外部ライブラリを使う具体処理
+│       ├── client/index.rs         # HTTPクライアント実装
 │       ├── coordinate/
+│       │   └── proj_core_coordinate_transformer.rs # PROJ座標変換
 │       ├── duckdb/
-│       ├── geocoding/
-│       ├── json/
-│       ├── mod.rs
-│       └── ...
-├── Cargo.toml                  # Cargo設定
-├── Cargo.lock
-├── README.md
-└── target/                     # ビルド成果物
+│       │   └── vector_repository.rs # GeoJSON/WKB保存とBBox検索
+│       ├── geocoding/index.rs      # ジオコーディングAPI呼び出し
+│       └── json/
+│           ├── load_raster_tile_json.rs # ラスター設定の読込・保存
+│           └── load_vector_json.rs      # ベクター設定の読込・保存
+├── Cargo.toml                      # Rust依存関係とパッケージ設定
+├── Cargo.lock                      # 依存関係の固定バージョン
+└── README.md
 ```
+
+### 主な処理の流れ
+1. `layer_controller_app.rs` がレイヤー設定を表示し、変更を設定JSONへ保存します。
+2. `map_state_service.rs` と `vector_repository.rs` がGeoJSONを読み、WKBと空間範囲に変換してDuckDBへ格納します。
+3. `vector_layer_service.rs` がWKBの形状を読み取り、EPSGから画面座標へ投影します。
+4. `vector_layer_app.rs` が点・線・ポリゴンを描画します。ポリゴンはEvenOdd塗り規則で穴を表現します。
+5. ラスタータイルは `map_render_service.rs` で可視範囲を計算し、`raster_tile_layer_app.rs` が設定順に描画します。
 
 ## UIと地図の責務分離
 現在の構造では、アプリの画面は主に `apps` 配下にあります。
@@ -160,6 +191,11 @@ DattoGIS/
 - `json`: JSONの読み込みやデータ変換
 
 これにより、UIやドメイン層からは「何をしたいか」に集中でき、具体的な実装はインフラ層に隠す設計になっています。
+
+## ベクター形状の処理
+GeoJSONの座標配列は `vector_repository.rs` でWKBへ変換し、型番号と座標数を保ったままDuckDBへ保存します。Polygonは外周と内側リングを別々に保持し、MultiPolygonは複数のPolygonへ分解して画面形状にします。
+
+画面座標への変換では、各頂点を設定されたEPSGからWeb Mercatorへ変換した後、地図中心とズームに基づくピクセル座標へ変換します。穴はリングごとのサブパスをEvenOdd規則で塗ることで、リングの向きに依存せず塗り抜きます。
 
 ## 今の開発の特徴
 現時点の構成では、次のような設計意図が見えてきます。

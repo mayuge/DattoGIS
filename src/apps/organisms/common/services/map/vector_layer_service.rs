@@ -17,6 +17,7 @@ impl VectorLayerServiceTrait for VectorLayerService {
         zoom_level: u32,
         viewport_center: (f64, f64),
     ) -> Vec<ScreenGeometry> {
+        // 中心座標をピクセル化し、WKB形状ごとに投影・画面形状化する。
         let center_pixel = WorldPixel::convert_coordinate_to_pixel(&center, zoom_level);
         features
             .iter()
@@ -65,6 +66,7 @@ enum Geometry {
 }
 
 fn read_wkb(wkb: &[u8]) -> Option<Geometry> {
+    // 現在はlittle-endian WKBを読み、Point/LineString/Polygon/MultiPolygonを識別する。
     if wkb.len() < 5 || wkb[0] != 1 {
         return None;
     }
@@ -109,6 +111,7 @@ fn read_u32(wkb: &[u8], offset: &mut usize) -> Option<u32> {
 }
 
 fn read_positions(wkb: &[u8], offset: &mut usize) -> Option<Vec<(f64, f64)>> {
+    // 頂点数分のX/Y値を読み、読み取り位置を次のWKB要素へ進める。
     let count = read_u32(wkb, offset)? as usize;
     (0..count)
         .map(|_| {
@@ -122,6 +125,7 @@ fn read_positions(wkb: &[u8], offset: &mut usize) -> Option<Vec<(f64, f64)>> {
 }
 
 fn read_polygon_body(wkb: &[u8], offset: &mut usize) -> Option<Vec<Vec<(f64, f64)>>> {
+    // 外周と内側リングを分けたまま読み、後段で穴として描ける形を保つ。
     let ring_count = read_u32(wkb, offset)? as usize;
     (0..ring_count)
         .map(|_| read_positions(wkb, offset))
@@ -135,6 +139,7 @@ fn project_geometry(
     zoom_level: u32,
     viewport_center: (f64, f64),
 ) -> Option<Vec<(f32, f32)>> {
+    // 各座標を指定EPSGからWeb Mercatorへ変換し、ビューポート内の相対ピクセル値にする。
     positions
         .into_iter()
         .map(|(longitude, latitude)| {
@@ -161,6 +166,7 @@ fn project_polygon(
     zoom_level: u32,
     viewport_center: (f64, f64),
 ) -> Option<Vec<Vec<(f32, f32)>>> {
+    // Polygonのすべてのリングを同じ投影条件で変換する。
     rings
         .into_iter()
         .map(|ring| project_geometry(ring, epsg, center_pixel, zoom_level, viewport_center))

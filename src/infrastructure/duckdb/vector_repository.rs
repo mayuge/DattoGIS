@@ -79,9 +79,11 @@ impl VectorRepositoryTrait for DuckDbVectorRepository {
 
 impl DuckDbVectorRepository {
     fn ensure_layer_loaded(&self, layer: &VectorLayer) -> Result<()> {
+        // 同じレイヤーを繰り返し読み込まないよう、ロード済みIDを確認する。
         if self.loaded_layers.borrow().contains(&layer.id) {
             return Ok(());
         }
+        // GeoJSONの各地物をWKB、検索用BBox、属性JSONに分けて保存する。
         let geojson = std::fs::read_to_string(Path::new(&layer.path))
             .with_context(|| format!("read GeoJSON: {}", layer.path))?;
         let document: Value = serde_json::from_str(&geojson).context("parse GeoJSON")?;
@@ -112,6 +114,7 @@ impl DuckDbVectorRepository {
 }
 
 fn geometry_to_wkb(geometry: &Value) -> Result<Vec<u8>> {
+    // GeoJSONのgeometry typeに応じて、WKBの型番号と座標本体を組み立てる。
     let geometry_type = geometry
         .get("type")
         .and_then(Value::as_str)
@@ -141,6 +144,7 @@ fn geometry_to_wkb(geometry: &Value) -> Result<Vec<u8>> {
             wkb.extend(6u32.to_le_bytes());
             wkb.extend((polygons.len() as u32).to_le_bytes());
             for polygon in polygons {
+                // WKBのMultiPolygon内部要素は、Polygonの完全なWKBとして格納する。
                 wkb.push(1);
                 wkb.extend(3u32.to_le_bytes());
                 write_polygon_body(&mut wkb, polygon)?;
@@ -152,6 +156,7 @@ fn geometry_to_wkb(geometry: &Value) -> Result<Vec<u8>> {
 }
 
 fn write_polygon_body(wkb: &mut Vec<u8>, coordinates: &Value) -> Result<()> {
+    // リング数と各リングの座標を順に書く。先頭リングが外周、後続が穴になる。
     let rings = coordinates
         .as_array()
         .ok_or_else(|| anyhow!("Polygon coordinates are invalid"))?;
@@ -163,6 +168,7 @@ fn write_polygon_body(wkb: &mut Vec<u8>, coordinates: &Value) -> Result<()> {
 }
 
 fn write_positions(wkb: &mut Vec<u8>, positions: &Value) -> Result<()> {
+    // LineStringまたはリングの頂点数を記録してから座標を追加する。
     let positions = positions
         .as_array()
         .ok_or_else(|| anyhow!("GeoJSON positions are invalid"))?;
@@ -174,6 +180,7 @@ fn write_positions(wkb: &mut Vec<u8>, positions: &Value) -> Result<()> {
 }
 
 fn write_position(wkb: &mut Vec<u8>, position: &Value) -> Result<()> {
+    // GeoJSONの各頂点からX/Yを取り出し、WKBのlittle-endian形式で書き込む。
     let position = position
         .as_array()
         .ok_or_else(|| anyhow!("GeoJSON position is invalid"))?;
@@ -191,6 +198,7 @@ fn write_position(wkb: &mut Vec<u8>, position: &Value) -> Result<()> {
 }
 
 fn geometry_bbox(geometry: &Value) -> Result<(f64, f64, f64, f64)> {
+    // PolygonやMultiPolygonの入れ子も再帰走査し、全頂点を含むBBoxを求める。
     let mut positions = Vec::new();
     collect_positions(
         geometry
@@ -215,6 +223,7 @@ fn collect_positions(value: &Value, positions: &mut Vec<(f64, f64)>) -> Result<(
     let Some(values) = value.as_array() else {
         return Err(anyhow!("GeoJSON coordinates are invalid"));
     };
+    // 数値2つの配列は座標、それ以外は形状階層として再帰的にたどる。
     if values.len() >= 2 && values[0].is_number() && values[1].is_number() {
         positions.push((
             values[0]

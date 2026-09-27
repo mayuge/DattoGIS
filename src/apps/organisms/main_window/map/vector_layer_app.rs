@@ -56,17 +56,18 @@ impl VectorLayerApp {
                                 }
                             }
                             ScreenGeometry::Polygon(rings) => {
-                                let mut fill_path = PathBuilder::fill().with_style(
-                                    PathStyle::Fill(
+                                // EvenOdd規則により、内側リングを外周の向きによらず穴にする。
+                                let mut fill_path =
+                                    PathBuilder::fill().with_style(PathStyle::Fill(
                                         FillOptions::default().with_fill_rule(FillRule::EvenOdd),
-                                    ),
-                                );
+                                    ));
                                 let mut stroke_path = PathBuilder::stroke(px(style.stroke_width));
                                 for ring in &rings {
                                     let Some((first_x, first_y)) = ring.first().copied() else {
                                         continue;
                                     };
                                     let start = point(px(first_x), px(first_y));
+                                    // 塗りと輪郭の両方へリングごとの閉じたサブパスを追加する。
                                     fill_path.move_to(start);
                                     stroke_path.move_to(start);
                                     for &(x, y) in &ring[1..] {
