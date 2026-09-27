@@ -5,6 +5,7 @@ use crate::domain::types::map_layer_type::VectorFeature;
 pub enum ScreenGeometry {
     Point((f32, f32)),
     LineString(Vec<(f32, f32)>),
+    Polygon(Vec<Vec<(f32, f32)>>),
 }
 
 pub trait VectorLayerServiceTrait {

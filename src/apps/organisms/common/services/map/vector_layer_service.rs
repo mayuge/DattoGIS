@@ -21,7 +21,7 @@ impl VectorLayerServiceTrait for VectorLayerService {
         features
             .iter()
             .filter_map(|feature| read_wkb(&feature.geometry_wkb))
-            .filter_map(|geometry| match geometry {
+            .flat_map(|geometry| match geometry {
                 Geometry::Point(position) => project_geometry(
                     vec![position],
                     epsg,
@@ -30,11 +30,28 @@ impl VectorLayerServiceTrait for VectorLayerService {
                     viewport_center,
                 )
                 .and_then(|positions| positions.first().copied())
-                .map(ScreenGeometry::Point),
+                .map(ScreenGeometry::Point)
+                .into_iter()
+                .collect::<Vec<_>>(),
                 Geometry::LineString(positions) => {
                     project_geometry(positions, epsg, center_pixel, zoom_level, viewport_center)
                         .map(ScreenGeometry::LineString)
+                        .into_iter()
+                        .collect()
                 }
+                Geometry::Polygon(rings) => {
+                    project_polygon(rings, epsg, center_pixel, zoom_level, viewport_center)
+                        .map(ScreenGeometry::Polygon)
+                        .into_iter()
+                        .collect()
+                }
+                Geometry::MultiPolygon(polygons) => polygons
+                    .into_iter()
+                    .filter_map(|rings| {
+                        project_polygon(rings, epsg, center_pixel, zoom_level, viewport_center)
+                    })
+                    .map(ScreenGeometry::Polygon)
+                    .collect(),
             })
             .collect()
     }
@@ -43,6 +60,8 @@ impl VectorLayerServiceTrait for VectorLayerService {
 enum Geometry {
     Point((f64, f64)),
     LineString(Vec<(f64, f64)>),
+    Polygon(Vec<Vec<(f64, f64)>>),
+    MultiPolygon(Vec<Vec<Vec<(f64, f64)>>>),
 }
 
 fn read_wkb(wkb: &[u8]) -> Option<Geometry> {
@@ -56,23 +75,57 @@ fn read_wkb(wkb: &[u8]) -> Option<Geometry> {
             f64::from_le_bytes(wkb[13..21].try_into().ok()?),
         ))),
         2 => {
-            let count = u32::from_le_bytes(wkb.get(5..9)?.try_into().ok()?) as usize;
-            if wkb.len() < 9 + count * 16 {
-                return None;
+            let mut offset = 5;
+            Some(Geometry::LineString(read_positions(wkb, &mut offset)?))
+        }
+        3 => {
+            let mut offset = 5;
+            Some(Geometry::Polygon(read_polygon_body(wkb, &mut offset)?))
+        }
+        6 => {
+            let mut offset = 5;
+            let count = read_u32(wkb, &mut offset)? as usize;
+            let mut polygons = Vec::with_capacity(count);
+            for _ in 0..count {
+                if *wkb.get(offset)? != 1 {
+                    return None;
+                }
+                offset += 1;
+                if read_u32(wkb, &mut offset)? != 3 {
+                    return None;
+                }
+                polygons.push(read_polygon_body(wkb, &mut offset)?);
             }
-            let positions = (0..count)
-                .map(|index| {
-                    let offset = 9 + index * 16;
-                    Some((
-                        f64::from_le_bytes(wkb[offset..offset + 8].try_into().ok()?),
-                        f64::from_le_bytes(wkb[offset + 8..offset + 16].try_into().ok()?),
-                    ))
-                })
-                .collect::<Option<Vec<_>>>()?;
-            Some(Geometry::LineString(positions))
+            Some(Geometry::MultiPolygon(polygons))
         }
         _ => None,
     }
+}
+
+fn read_u32(wkb: &[u8], offset: &mut usize) -> Option<u32> {
+    let value = u32::from_le_bytes(wkb.get(*offset..*offset + 4)?.try_into().ok()?);
+    *offset += 4;
+    Some(value)
+}
+
+fn read_positions(wkb: &[u8], offset: &mut usize) -> Option<Vec<(f64, f64)>> {
+    let count = read_u32(wkb, offset)? as usize;
+    (0..count)
+        .map(|_| {
+            let x = f64::from_le_bytes(wkb.get(*offset..*offset + 8)?.try_into().ok()?);
+            *offset += 8;
+            let y = f64::from_le_bytes(wkb.get(*offset..*offset + 8)?.try_into().ok()?);
+            *offset += 8;
+            Some((x, y))
+        })
+        .collect()
+}
+
+fn read_polygon_body(wkb: &[u8], offset: &mut usize) -> Option<Vec<Vec<(f64, f64)>>> {
+    let ring_count = read_u32(wkb, offset)? as usize;
+    (0..ring_count)
+        .map(|_| read_positions(wkb, offset))
+        .collect()
 }
 
 fn project_geometry(
@@ -98,5 +151,18 @@ fn project_geometry(
                 (viewport_center.1 + pixel.pixel_y - center_pixel.pixel_y) as f32,
             ))
         })
+        .collect()
+}
+
+fn project_polygon(
+    rings: Vec<Vec<(f64, f64)>>,
+    epsg: u32,
+    center_pixel: WorldPixel,
+    zoom_level: u32,
+    viewport_center: (f64, f64),
+) -> Option<Vec<Vec<(f32, f32)>>> {
+    rings
+        .into_iter()
+        .map(|ring| project_geometry(ring, epsg, center_pixel, zoom_level, viewport_center))
         .collect()
 }

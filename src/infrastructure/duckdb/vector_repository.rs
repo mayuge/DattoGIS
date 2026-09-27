@@ -132,17 +132,34 @@ fn geometry_to_wkb(geometry: &Value) -> Result<Vec<u8>> {
         }
         "Polygon" => {
             wkb.extend(3u32.to_le_bytes());
-            let rings = coordinates
+            write_polygon_body(&mut wkb, coordinates)?;
+        }
+        "MultiPolygon" => {
+            let polygons = coordinates
                 .as_array()
-                .ok_or_else(|| anyhow!("Polygon coordinates are invalid"))?;
-            wkb.extend((rings.len() as u32).to_le_bytes());
-            for ring in rings {
-                write_positions(&mut wkb, ring)?;
+                .ok_or_else(|| anyhow!("MultiPolygon coordinates are invalid"))?;
+            wkb.extend(6u32.to_le_bytes());
+            wkb.extend((polygons.len() as u32).to_le_bytes());
+            for polygon in polygons {
+                wkb.push(1);
+                wkb.extend(3u32.to_le_bytes());
+                write_polygon_body(&mut wkb, polygon)?;
             }
         }
         _ => return Err(anyhow!("unsupported GeoJSON geometry: {geometry_type}")),
     }
     Ok(wkb)
+}
+
+fn write_polygon_body(wkb: &mut Vec<u8>, coordinates: &Value) -> Result<()> {
+    let rings = coordinates
+        .as_array()
+        .ok_or_else(|| anyhow!("Polygon coordinates are invalid"))?;
+    wkb.extend((rings.len() as u32).to_le_bytes());
+    for ring in rings {
+        write_positions(wkb, ring)?;
+    }
+    Ok(())
 }
 
 fn write_positions(wkb: &mut Vec<u8>, positions: &Value) -> Result<()> {

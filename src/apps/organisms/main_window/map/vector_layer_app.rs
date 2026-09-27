@@ -1,4 +1,4 @@
-use gpui::{PathBuilder, Styled, canvas, point, px, rgb};
+use gpui::{FillOptions, FillRule, PathBuilder, PathStyle, Styled, canvas, point, px, rgb};
 
 use crate::apps::organisms::common::services::map::map_render_service::VectorGeometryCacheEntry;
 use crate::domain::params::design_token_config::COLOR_WARNING;
@@ -49,6 +49,38 @@ impl VectorLayerApp {
                                     path.line_to(point(px(x), px(y)));
                                 }
                                 if let Ok(path) = path.build() {
+                                    window.paint_path(
+                                        path,
+                                        parse_color(&style.stroke_color).alpha(opacity),
+                                    );
+                                }
+                            }
+                            ScreenGeometry::Polygon(rings) => {
+                                let mut fill_path = PathBuilder::fill().with_style(
+                                    PathStyle::Fill(
+                                        FillOptions::default().with_fill_rule(FillRule::EvenOdd),
+                                    ),
+                                );
+                                let mut stroke_path = PathBuilder::stroke(px(style.stroke_width));
+                                for ring in &rings {
+                                    let Some((first_x, first_y)) = ring.first().copied() else {
+                                        continue;
+                                    };
+                                    let start = point(px(first_x), px(first_y));
+                                    fill_path.move_to(start);
+                                    stroke_path.move_to(start);
+                                    for &(x, y) in &ring[1..] {
+                                        let position = point(px(x), px(y));
+                                        fill_path.line_to(position);
+                                        stroke_path.line_to(position);
+                                    }
+                                    fill_path.close();
+                                    stroke_path.close();
+                                }
+                                if let Ok(path) = fill_path.build() {
+                                    window.paint_path(path, color);
+                                }
+                                if let Ok(path) = stroke_path.build() {
                                     window.paint_path(
                                         path,
                                         parse_color(&style.stroke_color).alpha(opacity),

@@ -26,5 +26,33 @@
       "stroke_color": "#ef4444",
       "stroke_width": 1.0
     }
+  },
+  {
+    "id": "polygon",
+    "name": "多角形",
+    "path": "assets/geo/polygon.geojson",
+    "epsg": 4326,
+    "opacity": 0.5,
+    "visible": false,
+    "attribution": "",
+    "style": {
+      "fill_color": "#fbbf24",
+      "stroke_color": "#ef4444",
+      "stroke_width": 1.0
+    }
+  },
+  {
+    "id": "multipolygon",
+    "name": "複数の多角形",
+    "path": "assets/geo/multipolygon.geojson",
+    "epsg": 4326,
+    "opacity": 0.5,
+    "visible": true,
+    "attribution": "",
+    "style": {
+      "fill_color": "#fbbf24",
+      "stroke_color": "#ef4444",
+      "stroke_width": 1.0
+    }
   }
 ]
