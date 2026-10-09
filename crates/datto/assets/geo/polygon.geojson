@@ -1,0 +1,20 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"properties": { "name": "サンプル多角形" },
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [[
+					[139.608, 35.698],
+					[139.626, 35.696],
+					[139.637, 35.706],
+					[139.629, 35.719],
+					[139.611, 35.716],
+					[139.608, 35.698]
+				]]
+			}
+		}
+	]
+}

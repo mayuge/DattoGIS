@@ -1,0 +1,47 @@
+use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
+use crate::domain::types::map_layer_type::RasterTileLayer;
+
+pub struct LoadRasterTileJson;
+
+impl LoadRasterTileJsonTrait for LoadRasterTileJson {
+    // JSONファイルからラスタタイルの設定を読み込み
+    /// ラスタータイルレイヤー設定を JSON ファイルから読み込む。
+    fn load() -> Vec<RasterTileLayer> {
+        // JSONファイルのパスを指定
+        let config_path = std::path::PathBuf::from("assets/config/raster_tile_config.json");
+        // JSONファイルを読み込む
+        let content = match std::fs::read_to_string(&config_path) {
+            Ok(content) => content,
+            Err(err) => {
+                eprintln!(
+                    "failed to read raster tile config {:?}: {}",
+                    config_path, err
+                );
+                return vec![];
+            }
+        };
+        // JSONをパースしてVec<RasterTileLayer>に変換
+        let raster_tile_layers: Vec<RasterTileLayer> = serde_json::from_str(&content)
+            .unwrap_or_else(|err| {
+                eprintln!(
+                    "failed to parse raster tile config {:?}: {}",
+                    config_path, err
+                );
+                vec![]
+            });
+        raster_tile_layers
+    }
+
+    fn save(layers: &[RasterTileLayer]) -> Result<(), String> {
+        let config_path = std::path::PathBuf::from("assets/config/raster_tile_config.json");
+        let content = serde_json::to_string_pretty(layers)
+            .map_err(|err| format!("failed to serialize raster tile config: {err}"))?;
+
+        std::fs::write(&config_path, content).map_err(|err| {
+            format!(
+                "failed to write raster tile config {}: {err}",
+                config_path.display()
+            )
+        })
+    }
+}

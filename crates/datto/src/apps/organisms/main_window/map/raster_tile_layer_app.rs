@@ -1,0 +1,53 @@
+use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
+use crate::domain::params::map_config::RASTER_TILE_SIZE;
+use crate::domain::traits::map_tile_trait::MapTileTrait;
+use crate::domain::types::map_layer_type::RasterTileLayer;
+use gpui::{IntoElement, ParentElement, SharedString, Styled, div, img, px, retain_all};
+
+pub struct RasterTileLayerApp;
+
+impl RasterTileLayerApp {
+    /// 可視レイヤーのタイル画像を設定順に描画する。
+    pub fn render(
+        //各タイルの{z}{x}{y}の数値のリストを保持
+        visible_tiles: Vec<MapTile>,
+        //レイヤーのリスト
+        raster_tile_layers: Vec<RasterTileLayer>,
+    ) -> impl IntoElement {
+        let layers: Vec<_> = raster_tile_layers
+            .into_iter()
+            .filter(|layer| layer.visible)
+            .collect();
+
+        let mut rendered_tiles = Vec::new();
+
+        for layer in layers.into_iter().rev() {
+            let opacity = layer.opacity;
+            let url = layer.url.clone();
+
+            //レイヤーの透明度が0の場合は描画しない
+            if opacity <= 0.0 {
+                continue;
+            }
+
+            // 各タイルのURLを生成して描画する
+            for tile in &visible_tiles {
+                rendered_tiles.push(
+                    img(SharedString::from(tile.generate_tile_url(&url)))
+                        .absolute()
+                        .left(px(tile.draw_x))
+                        .top(px(tile.draw_y))
+                        .w(px(RASTER_TILE_SIZE as f32))
+                        .h(px(RASTER_TILE_SIZE as f32))
+                        .opacity(opacity),
+                );
+            }
+        }
+
+        div()
+            .absolute()
+            .size_full()
+            .image_cache(retain_all("raster-tile-cache"))
+            .children(rendered_tiles)
+    }
+}
