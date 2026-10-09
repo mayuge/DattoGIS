@@ -1,5 +1,3 @@
-use proj_core::Transform;
-
 use crate::domain::traits::coordinate_transformer_trait::{
     CoordinateTransformError, CoordinateTransformer,
 };
@@ -14,11 +12,9 @@ impl CoordinateTransformer for ProjCoreCoordinateTransformer {
         &self,
         coordinate: EpsgCoordinate,
     ) -> Result<WebMercatorCoordinate, CoordinateTransformError> {
-        let transformer = Transform::new(&format!("EPSG:{}", coordinate.epsg), "EPSG:3857")
-            .map_err(|error| CoordinateTransformError(error.to_string()))?;
-        let (x, y) = transformer
-            .convert((coordinate.x, coordinate.y))
-            .map_err(|error| CoordinateTransformError(error.to_string()))?;
+        let (x, y) =
+            engine::transform_coordinate(coordinate.epsg, 3857, (coordinate.x, coordinate.y))
+                .map_err(|error| CoordinateTransformError(error.to_string()))?;
 
         Ok(WebMercatorCoordinate { x, y })
     }
@@ -29,10 +25,7 @@ impl CoordinateTransformer for ProjCoreCoordinateTransformer {
         coordinate: WebMercatorCoordinate,
         epsg: u32,
     ) -> Result<EpsgCoordinate, CoordinateTransformError> {
-        let transformer = Transform::new("EPSG:3857", &format!("EPSG:{}", epsg))
-            .map_err(|error| CoordinateTransformError(error.to_string()))?;
-        let (x, y) = transformer
-            .convert((coordinate.x, coordinate.y))
+        let (x, y) = engine::transform_coordinate(3857, epsg, (coordinate.x, coordinate.y))
             .map_err(|error| CoordinateTransformError(error.to_string()))?;
 
         Ok(EpsgCoordinate { x, y, epsg })

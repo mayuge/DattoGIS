@@ -1,8 +1,8 @@
-use crate::domain::params::map_config::{
-    MAP_MAX_ZOOM_LEVEL, MAP_MIN_ZOOM_LEVEL, RASTER_TILE_SIZE, WEB_MERCATOR_HALF_WORLD_WIDTH,
-};
-use crate::domain::traits::map_event_trait::MapEventTrait;
 use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
+use std::error::Error;
+
+use crate::domain::params::map_config::{MAP_MAX_ZOOM_LEVEL, MAP_MIN_ZOOM_LEVEL};
+use crate::domain::traits::map_event_trait::MapEventTrait;
 
 pub struct MapEvent;
 
@@ -17,30 +17,23 @@ impl MapEventTrait for MapEvent {
         } else {
             map.zoom_level
         };
-        map.zoom_level = map
-            .zoom_level
-            .clamp(MAP_MIN_ZOOM_LEVEL, MAP_MAX_ZOOM_LEVEL);
+        map.zoom_level = map.zoom_level.clamp(MAP_MIN_ZOOM_LEVEL, MAP_MAX_ZOOM_LEVEL);
     }
 
     //マップ移動
     /// ドラッグしたピクセル量に応じて地図中心を移動する。
-    fn pan_by_pixels(map: &mut MapInstance, delta_x: f32, delta_y: f32) {
-        let zoom_level = map.zoom_level;
-        //WEB_MERCATOR_HALF_WORLD_WIDTHは、メートル換算したWeb Mercatorの原点から東西端(円周の半分)×円周率(π)の値
-        //世界全体の投影幅 2πR（約 40,075km）、WEB_MERCATOR_HALF_WORLD_WIDTH * 2.0
-        //meters_per_pixelでは、RASTER_TILE_SIZE=256pxとして、ズームレベルの数だけ累乗した結果、RASTER_TILE_SIZE × 2^zoom_level
-        //ズームすると増えるタイルに対して、縮尺を小さくでき、ズームレベルに合わせた移動になる
-        let meters_per_pixel =
-            WEB_MERCATOR_HALF_WORLD_WIDTH * 2.0 / (RASTER_TILE_SIZE * (1u32 << zoom_level) as f64);
-        //メルカトル図法では、両極を表示できないため切り捨てる
-        map.center.x = (map.center.x - f64::from(delta_x) * meters_per_pixel).clamp(
-            -WEB_MERCATOR_HALF_WORLD_WIDTH,
-            WEB_MERCATOR_HALF_WORLD_WIDTH,
-        );
-        //メルカトル図法では、両極を表示できないため切り捨てる
-        map.center.y = (map.center.y + f64::from(delta_y) * meters_per_pixel).clamp(
-            -WEB_MERCATOR_HALF_WORLD_WIDTH,
-            WEB_MERCATOR_HALF_WORLD_WIDTH,
-        );
+    fn pan_by_pixels(
+        map: &mut MapInstance,
+        delta_x: f32,
+        delta_y: f32,
+    ) -> Result<(), Box<dyn Error>> {
+        let (x, y) = engine::pan_web_mercator_center(
+            (map.center.x, map.center.y),
+            map.zoom_level,
+            (f64::from(delta_x), f64::from(delta_y)),
+        )?;
+        map.center.x = x;
+        map.center.y = y;
+        Ok(())
     }
 }

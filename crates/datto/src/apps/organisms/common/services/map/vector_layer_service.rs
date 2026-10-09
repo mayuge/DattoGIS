@@ -1,10 +1,6 @@
-use crate::apps::organisms::common::services::map::use_map_world_pixel::WorldPixel;
-use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::vector_layer_service_trait::{ScreenGeometry, VectorLayerServiceTrait};
-use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
-use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
+use crate::domain::types::map_coordinate_type::WebMercatorCoordinate;
 use crate::domain::types::map_layer_type::VectorFeature;
-use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCoreCoordinateTransformer;
 
 pub struct VectorLayerService;
 
@@ -17,40 +13,39 @@ impl VectorLayerServiceTrait for VectorLayerService {
         zoom_level: u32,
         viewport_center: (f64, f64),
     ) -> Vec<ScreenGeometry> {
-        // 中心座標をピクセル化し、WKB形状ごとに投影・画面形状化する。
-        let center_pixel = WorldPixel::convert_coordinate_to_pixel(&center, zoom_level);
+        let transform = match engine::ViewportTransform::new(
+            (center.x, center.y),
+            zoom_level,
+            viewport_center,
+            epsg,
+        ) {
+            Ok(transform) => transform,
+            Err(error) => {
+                eprintln!("failed to create vector viewport transform: {error}");
+                return Vec::new();
+            }
+        };
+
         features
             .iter()
             .filter_map(|feature| read_wkb(&feature.geometry_wkb))
             .flat_map(|geometry| match geometry {
-                Geometry::Point(position) => project_geometry(
-                    vec![position],
-                    epsg,
-                    center_pixel,
-                    zoom_level,
-                    viewport_center,
-                )
-                .and_then(|positions| positions.first().copied())
-                .map(ScreenGeometry::Point)
-                .into_iter()
-                .collect::<Vec<_>>(),
-                Geometry::LineString(positions) => {
-                    project_geometry(positions, epsg, center_pixel, zoom_level, viewport_center)
-                        .map(ScreenGeometry::LineString)
-                        .into_iter()
-                        .collect()
-                }
-                Geometry::Polygon(rings) => {
-                    project_polygon(rings, epsg, center_pixel, zoom_level, viewport_center)
-                        .map(ScreenGeometry::Polygon)
-                        .into_iter()
-                        .collect()
-                }
+                Geometry::Point(position) => project_geometry(vec![position], &transform)
+                    .and_then(|positions| positions.first().copied())
+                    .map(ScreenGeometry::Point)
+                    .into_iter()
+                    .collect::<Vec<_>>(),
+                Geometry::LineString(positions) => project_geometry(positions, &transform)
+                    .map(ScreenGeometry::LineString)
+                    .into_iter()
+                    .collect(),
+                Geometry::Polygon(rings) => project_polygon(rings, &transform)
+                    .map(ScreenGeometry::Polygon)
+                    .into_iter()
+                    .collect(),
                 Geometry::MultiPolygon(polygons) => polygons
                     .into_iter()
-                    .filter_map(|rings| {
-                        project_polygon(rings, epsg, center_pixel, zoom_level, viewport_center)
-                    })
+                    .filter_map(|rings| project_polygon(rings, &transform))
                     .map(ScreenGeometry::Polygon)
                     .collect(),
             })
@@ -134,41 +129,28 @@ fn read_polygon_body(wkb: &[u8], offset: &mut usize) -> Option<Vec<Vec<(f64, f64
 
 fn project_geometry(
     positions: Vec<(f64, f64)>,
-    epsg: u32,
-    center_pixel: WorldPixel,
-    zoom_level: u32,
-    viewport_center: (f64, f64),
+    transform: &engine::ViewportTransform,
 ) -> Option<Vec<(f32, f32)>> {
-    // 各座標を指定EPSGからWeb Mercatorへ変換し、ビューポート内の相対ピクセル値にする。
     positions
         .into_iter()
-        .map(|(longitude, latitude)| {
-            let coordinate = ProjCoreCoordinateTransformer
-                .epsg_coordinate_to_web_mercator(EpsgCoordinate {
-                    x: longitude,
-                    y: latitude,
-                    epsg,
-                })
-                .ok()?;
-            let pixel = WorldPixel::convert_coordinate_to_pixel(&coordinate, zoom_level);
-            Some((
-                (viewport_center.0 + pixel.pixel_x - center_pixel.pixel_x) as f32,
-                (viewport_center.1 + pixel.pixel_y - center_pixel.pixel_y) as f32,
-            ))
-        })
+        .map(
+            |coordinate| match transform.project_coordinate(coordinate) {
+                Ok(point) => Some((point.0 as f32, point.1 as f32)),
+                Err(error) => {
+                    eprintln!("failed to project vector coordinate: {error}");
+                    None
+                }
+            },
+        )
         .collect()
 }
 
 fn project_polygon(
     rings: Vec<Vec<(f64, f64)>>,
-    epsg: u32,
-    center_pixel: WorldPixel,
-    zoom_level: u32,
-    viewport_center: (f64, f64),
+    transform: &engine::ViewportTransform,
 ) -> Option<Vec<Vec<(f32, f32)>>> {
-    // Polygonのすべてのリングを同じ投影条件で変換する。
     rings
         .into_iter()
-        .map(|ring| project_geometry(ring, epsg, center_pixel, zoom_level, viewport_center))
+        .map(|ring| project_geometry(ring, transform))
         .collect()
 }

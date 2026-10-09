@@ -1,9 +1,10 @@
-use super::use_map_instance::MapInstance;
-use super::use_map_world_pixel::WorldPixel;
+use std::error::Error;
 
-use crate::domain::params::map_config::{RASTER_TILE_OVERSCAN, RASTER_TILE_SIZE};
+use crate::domain::params::map_config::RASTER_TILE_OVERSCAN;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
-use crate::domain::traits::world_pixel_trait::WorldPixelTrait;
+
+use super::use_map_engine;
+use super::use_map_instance::MapInstance;
 
 /// 描画するラスタータイル情報
 #[derive(Debug, Clone)]
@@ -40,52 +41,32 @@ impl MapTileTrait for MapTile {
         map: &MapInstance,
         viewport_width: f32,
         viewport_height: f32,
-    ) -> Vec<Self> {
-        let zoom_level = map.zoom_level as u32;
-
-        let world_pixel = WorldPixel::convert_coordinate_to_pixel(&map.center, zoom_level);
-
-        let center_tile_column = world_pixel.tile_column() as i32;
-        let center_tile_row = world_pixel.tile_row() as i32;
-
-        let pixel_offset_x = world_pixel.pixel_offset_x() as f32;
-        let pixel_offset_y = world_pixel.pixel_offset_y() as f32;
-
-        //画面に必要なタイル枚数（余白を追加）
-        //余白は左右、上下セットなので2倍する
-        let visible_tile_count_x =
-            (viewport_width / RASTER_TILE_SIZE as f32).ceil() as i32 + RASTER_TILE_OVERSCAN * 2;
-
-        let visible_tile_count_y =
-            (viewport_height / RASTER_TILE_SIZE as f32).ceil() as i32 + RASTER_TILE_OVERSCAN * 2;
-
-        let mut visible_tiles = Vec::new();
-
-        for row_offset in -visible_tile_count_y / 2..=visible_tile_count_y / 2 {
-            for column_offset in -visible_tile_count_x / 2..=visible_tile_count_x / 2 {
-                let tile_column = center_tile_column + column_offset;
-                let tile_row = center_tile_row + row_offset;
-
-                if tile_column < 0 || tile_row < 0 {
-                    continue;
-                }
-                //描画位置は、中心を指定するため２で割る
-                let draw_x = viewport_width / 2.0 - pixel_offset_x
-                    + column_offset as f32 * RASTER_TILE_SIZE as f32;
-                //描画位置は、中心を指定するため２で割る
-                let draw_y = viewport_height / 2.0 - pixel_offset_y
-                    + row_offset as f32 * RASTER_TILE_SIZE as f32;
-
-                visible_tiles.push(Self {
-                    tile_column: tile_column as u32,
-                    tile_row: tile_row as u32,
-                    zoom_level,
-                    draw_x,
-                    draw_y,
-                });
-            }
+    ) -> Result<Vec<Self>, Box<dyn Error>> {
+        if !viewport_width.is_finite()
+            || !viewport_height.is_finite()
+            || viewport_width <= 0.0
+            || viewport_height <= 0.0
+        {
+            return Err("Invalid viewport dimensions".into());
         }
 
-        visible_tiles
+        let map_obj = use_map_engine::create_map_obj_with_overscan(
+            map,
+            f64::from(viewport_width),
+            f64::from(viewport_height),
+            u32::try_from(RASTER_TILE_OVERSCAN)?,
+        )?;
+
+        Ok(map_obj
+            .tiles
+            .into_iter()
+            .map(|tile| Self {
+                tile_column: tile.x,
+                tile_row: tile.y,
+                zoom_level: tile.z,
+                draw_x: tile.delta[0] as f32,
+                draw_y: tile.delta[1] as f32,
+            })
+            .collect())
     }
 }

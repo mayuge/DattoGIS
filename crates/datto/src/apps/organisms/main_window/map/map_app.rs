@@ -5,7 +5,6 @@ use crate::apps::organisms::common::services::map::map_render_service::{
 };
 use crate::apps::organisms::common::services::map::map_state_service::MapStateService;
 use crate::apps::organisms::common::services::map::use_map_area::MapArea;
-use crate::apps::organisms::common::services::map::use_map_bbox::MapBbox;
 use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
 use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::apps::organisms::main_window::map::raster_tile_layer_app::RasterTileLayerApp;
@@ -18,7 +17,6 @@ use crate::domain::traits::coordinate_transformer_trait::CoordinateTransformer;
 use crate::domain::traits::load_raster_tile_json_trait::LoadRasterTileJsonTrait;
 use crate::domain::traits::load_vector_json_trait::LoadVectorJsonTrait;
 use crate::domain::traits::map_area_trait::MapAreaTrait;
-use crate::domain::traits::vector_repository_trait::VectorRepositoryTrait;
 use crate::domain::types::geometry_cache_key_type::GeometryCacheKey;
 use crate::domain::types::map_coordinate_type::{EpsgCoordinate, WebMercatorCoordinate};
 use crate::domain::types::map_layer_type::{RasterTileLayer, VectorFeature, VectorLayer};
@@ -181,24 +179,19 @@ impl MapApp {
         let viewport = window.viewport_size();
         let map_area =
             MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
-        let bbox = MapBbox::calculate(&map_instance, map_area.width, map_area.height);
         let repository = DuckDbVectorRepository::new().expect("failed to initialize DuckDB");
-        let vector_layers: Vec<(VectorLayer, Vec<VectorFeature>)> = LoadVectorJson::load()
-            .into_iter()
-            .filter_map(
-                |layer| match repository.load_features_in_bbox(&layer, bbox) {
-                    Ok(features) => Some((layer, features)),
-                    Err(err) => {
-                        eprintln!("failed to load vector layer: {err:#}");
-                        None
-                    }
-                },
-            )
-            .collect();
+        let vector_layers = MapStateService::reload_vector_layers(
+            &repository,
+            &map_instance,
+            map_area.width,
+            map_area.height,
+        )
+        .expect("failed to load initial vector layers");
 
         let raster_layers = LoadRasterTileJson::load();
         let visible_tiles =
-            MapRenderService::resolve_visible_tiles(&map_instance, map_area.width, map_area.height);
+            MapRenderService::resolve_visible_tiles(&map_instance, map_area.width, map_area.height)
+                .expect("failed to calculate initial visible tiles");
         let center_x = f64::from(LAYER_CONTROLLER_WIDTH) + f64::from(map_area.width) / 2.0;
         let center_y = f64::from(HEADER_HEIGHT) + f64::from(map_area.height) / 2.0;
         let geometry_cache = MapRenderService::resolve_vector_geometries(
@@ -238,12 +231,7 @@ impl MapApp {
     /// 地図の中心座標を更新し、関連するレイヤー再読込と再描画を実行する。
     pub fn set_center(&mut self, center: WebMercatorCoordinate, cx: &mut Context<Self>) {
         self.map_instance.set_center(center);
-        self.vector_layers = MapStateService::reload_vector_layers(
-            &self.repository,
-            &self.map_instance,
-            self.viewport_width,
-            self.viewport_height,
-        );
+        self.reload_vector_layers();
         self.on_change_event(cx);
     }
 
@@ -255,12 +243,7 @@ impl MapApp {
     /// レイヤー設定JSONを再読込して地図に反映する。
     pub fn reload_layer_config(&mut self, cx: &mut Context<Self>) {
         self.raster_tile_layers = LoadRasterTileJson::load();
-        self.vector_layers = MapStateService::reload_vector_layers(
-            &self.repository,
-            &self.map_instance,
-            self.viewport_width,
-            self.viewport_height,
-        );
+        self.reload_vector_layers();
         self.geometry_cache_key = None;
         self.on_change_event(cx);
     }
@@ -315,6 +298,18 @@ impl MapApp {
     /// viewport と zoom の key が変わったときだけ geometry を再計算し、
     /// それ以外では保存済みの描画結果をそのまま再利用する。
     fn on_change_event(&mut self, cx: &mut Context<Self>) {
+        let visible_tiles = match MapRenderService::resolve_visible_tiles(
+            &self.map_instance,
+            self.viewport_width,
+            self.viewport_height,
+        ) {
+            Ok(tiles) => tiles,
+            Err(err) => {
+                eprintln!("failed to calculate visible tiles: {err:#}");
+                return;
+            }
+        };
+
         let raster_layers = self.raster_tile_layers.clone();
         let vector_layers = self.vector_layers.clone();
         let next_key = MapRenderService::build_geometry_cache_key(
@@ -340,12 +335,6 @@ impl MapApp {
             self.geometry_cache_key = Some(next_key.clone());
         }
 
-        let visible_tiles = MapRenderService::resolve_visible_tiles(
-            &self.map_instance,
-            self.viewport_width,
-            self.viewport_height,
-        );
-
         self.content.update(cx, |content, cx| {
             content.update_state(
                 raster_layers,
@@ -362,12 +351,15 @@ impl MapApp {
     ///
     /// 画面中心やビューサイズに基づいて bbox を計算し、表示領域内の地物だけを取得する。
     fn reload_vector_layers(&mut self) {
-        self.vector_layers = MapStateService::reload_vector_layers(
+        match MapStateService::reload_vector_layers(
             &self.repository,
             &self.map_instance,
             self.viewport_width,
             self.viewport_height,
-        );
+        ) {
+            Ok(layers) => self.vector_layers = layers,
+            Err(err) => eprintln!("failed to reload vector layers: {err:#}"),
+        }
     }
 }
 
@@ -449,11 +441,13 @@ impl Render for MapApp {
                         content.set_vector_visibility(true, cx);
                     });
                     if map_app.drag_state.offset_x != 0.0 || map_app.drag_state.offset_y != 0.0 {
-                        MapStateService::pan(
+                        if let Err(error) = MapStateService::pan(
                             &mut map_app.map_instance,
                             map_app.drag_state.offset_x,
                             map_app.drag_state.offset_y,
-                        );
+                        ) {
+                            eprintln!("failed to pan map: {error}");
+                        }
                         map_app.drag_state.offset_x = 0.0;
                         map_app.drag_state.offset_y = 0.0;
                         let viewport = map_app.viewport.clone();

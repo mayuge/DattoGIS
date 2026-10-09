@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use crate::apps::organisms::common::services::map::use_map_bbox::MapBbox;
 use crate::apps::organisms::common::services::map::use_map_event::MapEvent;
 use crate::apps::organisms::common::services::map::use_map_instance::MapInstance;
@@ -18,8 +20,8 @@ impl MapStateService {
     }
 
     /// ドラッグによる平行移動を適用する。
-    pub fn pan(map: &mut MapInstance, delta_x: f32, delta_y: f32) {
-        MapEvent::pan_by_pixels(map, delta_x, delta_y);
+    pub fn pan(map: &mut MapInstance, delta_x: f32, delta_y: f32) -> Result<(), Box<dyn Error>> {
+        MapEvent::pan_by_pixels(map, delta_x, delta_y)
     }
 
     /// 現在の表示範囲に合わせてベクターレイヤーを再読み込みする。
@@ -28,14 +30,14 @@ impl MapStateService {
         map: &MapInstance,
         viewport_width: f32,
         viewport_height: f32,
-    ) -> Vec<(VectorLayer, Vec<VectorFeature>)> {
+    ) -> Result<Vec<(VectorLayer, Vec<VectorFeature>)>, Box<dyn Error>> {
         let bbox = if viewport_width > 0.0 && viewport_height > 0.0 {
-            Some(MapBbox::calculate(map, viewport_width, viewport_height))
+            Some(MapBbox::calculate(map, viewport_width, viewport_height)?)
         } else {
             None
         };
 
-        LoadVectorJson::load()
+        Ok(LoadVectorJson::load()
             .into_iter()
             .filter_map(|layer| {
                 let result = match bbox {
@@ -51,6 +53,6 @@ impl MapStateService {
                     }
                 }
             })
-            .collect()
+            .collect())
     }
 }

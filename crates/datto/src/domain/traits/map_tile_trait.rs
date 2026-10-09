@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use crate::domain::types::map_instance_type::MapInstance;
 
 pub trait MapTileTrait: Sized {
@@ -8,5 +10,5 @@ pub trait MapTileTrait: Sized {
         map: &MapInstance,
         viewport_width: f32,
         viewport_height: f32,
-    ) -> Vec<Self>;
+    ) -> Result<Vec<Self>, Box<dyn Error>>;
 }

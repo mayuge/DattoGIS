@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::apps::organisms::common::services::map::vector_layer_service::VectorLayerService;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
@@ -39,7 +41,7 @@ impl MapRenderService {
         map: &MapInstance,
         viewport_width: f32,
         viewport_height: f32,
-    ) -> Vec<MapTile> {
+    ) -> Result<Vec<MapTile>, Box<dyn Error>> {
         MapTile::calculate_visible_tiles(map, viewport_width, viewport_height)
     }
 

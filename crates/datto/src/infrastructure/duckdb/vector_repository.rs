@@ -206,17 +206,9 @@ fn geometry_bbox(geometry: &Value) -> Result<(f64, f64, f64, f64)> {
             .ok_or_else(|| anyhow!("GeoJSON geometry coordinates are missing"))?,
         &mut positions,
     )?;
-    let first = positions
-        .first()
-        .ok_or_else(|| anyhow!("GeoJSON geometry has no coordinates"))?;
-    let mut bbox = (first.0, first.1, first.0, first.1);
-    for (x, y) in positions.into_iter().skip(1) {
-        bbox.0 = bbox.0.min(x);
-        bbox.1 = bbox.1.min(y);
-        bbox.2 = bbox.2.max(x);
-        bbox.3 = bbox.3.max(y);
-    }
-    Ok(bbox)
+    engine::bounding_box(positions)
+        .map(|[min_x, min_y, max_x, max_y]| (min_x, min_y, max_x, max_y))
+        .map_err(|error| anyhow!(error.to_string()))
 }
 
 fn collect_positions(value: &Value, positions: &mut Vec<(f64, f64)>) -> Result<()> {
