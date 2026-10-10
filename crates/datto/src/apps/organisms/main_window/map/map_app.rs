@@ -24,6 +24,7 @@ use crate::infrastructure::coordinate::proj_core_coordinate_transformer::ProjCor
 use crate::infrastructure::duckdb::vector_repository::DuckDbVectorRepository;
 use crate::infrastructure::json::load_raster_tile_json::LoadRasterTileJson;
 use crate::infrastructure::json::load_vector_json::LoadVectorJson;
+use vector_engine::{VectorGeometryProjector, WkbVectorGeometryProjector};
 
 #[derive(Default)]
 //ドラッグ状態を規定する型
@@ -155,6 +156,7 @@ pub struct MapApp {
     viewport_width: f32,
     viewport_height: f32,
     repository: DuckDbVectorRepository,
+    geometry_projector: Box<dyn VectorGeometryProjector>,
     geometry_cache_key: Option<GeometryCacheKey>,
     geometry_cache: Vec<VectorGeometryCacheEntry>,
 }
@@ -180,8 +182,10 @@ impl MapApp {
         let map_area =
             MapArea::get_map_area_size(f32::from(viewport.width), f32::from(viewport.height));
         let repository = DuckDbVectorRepository::new().expect("failed to initialize DuckDB");
+        let geometry_projector = Box::<WkbVectorGeometryProjector>::default();
         let vector_layers = MapStateService::reload_vector_layers(
             &repository,
+            LoadVectorJson::load(),
             &map_instance,
             map_area.width,
             map_area.height,
@@ -198,6 +202,7 @@ impl MapApp {
             &vector_layers,
             &map_instance,
             (center_x, center_y),
+            geometry_projector.as_ref(),
         );
         let initial_cache_key = MapRenderService::build_geometry_cache_key(
             &map_instance,
@@ -223,6 +228,7 @@ impl MapApp {
             viewport_width: map_area.width,
             viewport_height: map_area.height,
             repository,
+            geometry_projector,
             geometry_cache_key: Some(initial_cache_key),
             geometry_cache,
         }
@@ -331,6 +337,7 @@ impl MapApp {
                 &vector_layers,
                 &self.map_instance,
                 (center_x, center_y),
+                self.geometry_projector.as_ref(),
             );
             self.geometry_cache_key = Some(next_key.clone());
         }
@@ -353,6 +360,7 @@ impl MapApp {
     fn reload_vector_layers(&mut self) {
         match MapStateService::reload_vector_layers(
             &self.repository,
+            LoadVectorJson::load(),
             &self.map_instance,
             self.viewport_width,
             self.viewport_height,

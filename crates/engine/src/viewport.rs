@@ -1,5 +1,6 @@
 use proj_core::Transform;
 
+#[derive(Clone)]
 pub struct ViewportTransform {
     center_pixel: (f64, f64),
     viewport_center: (f64, f64),
@@ -63,28 +64,14 @@ pub fn pan_web_mercator_center(
     zoom: u32,
     delta: (f64, f64),
 ) -> Result<(f64, f64), Box<dyn std::error::Error>> {
-    if zoom > 30
-        || !center.0.is_finite()
-        || !center.1.is_finite()
-        || !delta.0.is_finite()
-        || !delta.1.is_finite()
-    {
-        return Err("Invalid map center, zoom, or pan delta".into());
-    }
-
-    let zoom = u8::try_from(zoom)?;
-    let tms = ogc_tms::web_mercator_quad().extended_to(zoom)?;
-    let matrix = tms.matrix(zoom)?;
-    let (origin_x, origin_y) = matrix.point_of_origin();
-    let span_x = f64::from(matrix.tile_width()) * matrix.cell_size();
-    let span_y = f64::from(matrix.tile_height()) * matrix.cell_size();
-    let max_x = origin_x + matrix.matrix_width() as f64 * span_x;
-    let min_y = origin_y - matrix.matrix_height() as f64 * span_y;
-
-    Ok((
-        (center.0 - delta.0 * matrix.cell_size()).clamp(origin_x, max_x),
-        (center.1 + delta.1 * matrix.cell_size()).clamp(min_y, origin_y),
-    ))
+    crate::map::move_xy_web_mercator_center(
+        center,
+        zoom,
+        crate::types::MoveXY {
+            x: delta.0,
+            y: delta.1,
+        },
+    )
 }
 
 #[cfg(test)]
@@ -102,7 +89,7 @@ mod tests {
     }
 
     #[test]
-    fn panning_uses_tile_matrix_resolution_and_bounds() {
+    fn moving_uses_tile_matrix_resolution_and_bounds() {
         let (x, y) = pan_web_mercator_center((0.0, 0.0), 0, (1.0, 1.0)).unwrap();
         assert!(x < 0.0);
         assert!(y > 0.0);

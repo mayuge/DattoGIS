@@ -25,11 +25,14 @@ impl FooterApp {
     fn map_status_text(&self, cx: &App) -> String {
         let map = self.map_app.read(cx).map();
         ProjCoreCoordinateTransformer
-            .web_mercator_to_epsg_coordinate(map.center, DATA_PROJ_EPSG)
+            .web_mercator_to_epsg_coordinate(map.center(), DATA_PROJ_EPSG)
             .map(|coordinate| {
                 format!(
                     "{:.4}, {:.4} | Zoom: {:.1} | EPSG: {}",
-                    coordinate.x, coordinate.y, map.zoom_level, coordinate.epsg,
+                    coordinate.x,
+                    coordinate.y,
+                    map.zoom_level(),
+                    coordinate.epsg,
                 )
             })
             .unwrap_or_else(|_| "座標変換エラー".to_string())

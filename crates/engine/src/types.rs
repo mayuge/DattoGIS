@@ -11,6 +11,13 @@ pub struct Screen {
     pub height: f64,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+/// Pixel displacement along the viewport's horizontal and vertical axes.
+pub struct MoveXY {
+    pub x: f64,
+    pub y: f64,
+}
+
 pub struct TileZXY {
     pub x: u32,
     pub y: u32,
@@ -19,6 +26,8 @@ pub struct TileZXY {
 }
 
 pub struct MapObject {
+    // WGS84: [longitude, latitude]
+    pub center: [f64; 2],
     // WGS84: [min_lon, min_lat, max_lon, max_lat]
     pub bbox: [f64; 4],
     pub tiles: Vec<TileZXY>,

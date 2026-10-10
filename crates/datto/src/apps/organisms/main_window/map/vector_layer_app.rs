@@ -2,7 +2,7 @@ use gpui::{FillOptions, FillRule, PathBuilder, PathStyle, Styled, canvas, point,
 
 use crate::apps::organisms::common::services::map::map_render_service::VectorGeometryCacheEntry;
 use crate::domain::params::design_token_config::COLOR_WARNING;
-use crate::domain::traits::vector_layer_service_trait::ScreenGeometry;
+use vector_engine::ScreenGeometry;
 
 pub struct VectorLayerApp;
 

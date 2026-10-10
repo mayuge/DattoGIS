@@ -3,10 +3,10 @@ use std::error::Error;
 use crate::apps::organisms::common::services::map::use_map_tile::MapTile;
 use crate::apps::organisms::common::services::map::vector_layer_service::VectorLayerService;
 use crate::domain::traits::map_tile_trait::MapTileTrait;
-use crate::domain::traits::vector_layer_service_trait::{ScreenGeometry, VectorLayerServiceTrait};
 use crate::domain::types::geometry_cache_key_type::GeometryCacheKey;
 use crate::domain::types::map_instance_type::MapInstance;
 use crate::domain::types::map_layer_type::{VectorFeature, VectorLayer, VectorStyle};
+use vector_engine::{ScreenGeometry, VectorGeometryProjector};
 
 pub type VectorGeometryCacheEntry = (String, VectorStyle, f32, Vec<ScreenGeometry>);
 
@@ -23,9 +23,10 @@ impl MapRenderService {
         viewport_width: f32,
         viewport_height: f32,
     ) -> GeometryCacheKey {
-        let zoom_level = map.zoom_level;
-        let center_x = map.center.x.round() as i64;
-        let center_y = map.center.y.round() as i64;
+        let center = map.center();
+        let zoom_level = map.zoom_level();
+        let center_x = center.x.round() as i64;
+        let center_y = center.y.round() as i64;
 
         GeometryCacheKey {
             zoom_level,
@@ -50,9 +51,10 @@ impl MapRenderService {
         vector_layers: &[(VectorLayer, Vec<VectorFeature>)],
         map: &MapInstance,
         viewport_center: (f64, f64),
+        projector: &dyn VectorGeometryProjector,
     ) -> Vec<VectorGeometryCacheEntry> {
-        let service = VectorLayerService;
-        let zoom_level = map.zoom_level;
+        let zoom_level = map.zoom_level();
+        let center = map.center();
 
         vector_layers
             .iter()
@@ -63,12 +65,13 @@ impl MapRenderService {
                     layer.id.clone(),
                     layer.style.clone(),
                     layer.opacity,
-                    service.screen_geometries(
+                    VectorLayerService::screen_geometries(
                         features,
                         layer.epsg,
-                        map.center,
+                        center,
                         zoom_level,
                         viewport_center,
+                        projector,
                     ),
                 )
             })
